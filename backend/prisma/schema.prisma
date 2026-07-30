@@ -1,0 +1,46 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+model Product {
+  id               Int      @id @default(autoincrement())
+
+  masterCategory   String
+  productName      String
+
+  gramRange        String
+  pricePerGram     Decimal
+  price            Decimal
+
+  isManualPrice    Boolean  @default(false)
+
+  stock            Int
+  supplier         String
+
+  // Shopee
+  variationNameShopee String?
+  productIdShopee     String?
+  variationIdShopee   String?
+
+  // Lazada
+  variationNameLazada String?
+  productIdLazada     String?
+  skuIdLazada         String?
+  keyLazada           String?
+  quantityLazada      Int?
+
+  // TikTok
+  variationNameTiktok String?
+  productIdTiktok     String?
+  skuIdTiktok         String?
+  categoryTiktok      String?
+  quantityTiktok      Int?
+
+  createdAt        DateTime @default(now())
+  updatedAt        DateTime @updatedAt
+}
