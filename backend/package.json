@@ -6,6 +6,8 @@
   "main": "index.js",
   "scripts": {
     "dev": "tsx watch src/server.ts",
+    "build": "tsc",
+    "start": "node dist/server.js",
     "import": "tsx src/scripts/importProducts.ts",
     "clear": "tsx src/scripts/clearProducts.ts",
     "test:group": "tsx src/scripts/testPriceGroup.ts",
