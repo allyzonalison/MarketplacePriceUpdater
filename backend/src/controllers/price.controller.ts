@@ -6,10 +6,11 @@ import {
 
 export const applyPricesController = async (req: Request, res: Response) => {
   try {
-    const { group, pricePerGram } = req.body;
+    const { group, supplier, pricePerGram } = req.body;
 
     await applyGroupPrice({
       group,
+      supplier,
       pricePerGram,
     });
 
@@ -27,10 +28,11 @@ export const applyPricesController = async (req: Request, res: Response) => {
 
 export const previewPricesController = async (req: Request, res: Response) => {
   try {
-    const { group, pricePerGram } = req.body;
+    const { group, supplier, pricePerGram } = req.body;
 
     const preview = await previewGroupPrice({
       group,
+      supplier,
       pricePerGram,
     });
 

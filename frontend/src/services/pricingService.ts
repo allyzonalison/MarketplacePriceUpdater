@@ -3,6 +3,7 @@ import type { Product } from "../types/product";
 
 export interface PreviewPriceRequest {
   group: string;
+  supplier: string;
   pricePerGram: number;
 }
 

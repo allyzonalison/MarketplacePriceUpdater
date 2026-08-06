@@ -15,6 +15,7 @@ interface SidebarProps {
 
 const Sidebar = ({ onPreview, onApplySuccess }: SidebarProps) => {
   const [group, setGroup] = useState("");
+  const [supplier, setSupplier] = useState("ALL");
   const [pricePerGram, setPricePerGram] = useState("");
   const [loading, setLoading] = useState(false);
 
@@ -33,6 +34,7 @@ const Sidebar = ({ onPreview, onApplySuccess }: SidebarProps) => {
 
       const previewProducts = await previewGroupPrice({
         group,
+        supplier,
         pricePerGram: Number(pricePerGram),
       });
 
@@ -64,6 +66,7 @@ const Sidebar = ({ onPreview, onApplySuccess }: SidebarProps) => {
 
       await applyGroupPrice({
         group,
+        supplier,
         pricePerGram: Number(pricePerGram),
       });
 
@@ -94,6 +97,18 @@ const Sidebar = ({ onPreview, onApplySuccess }: SidebarProps) => {
             <option value="ELECTROFORM">Electroform</option>
             <option value="RING_24K">24K Gold Rings</option>
             <option value="COUPLE">Couple Rings</option>
+          </select>
+
+          <select
+            value={supplier}
+            onChange={(e) => setSupplier(e.target.value)}
+            className="mb-3 w-full rounded-lg border border-gray-300 px-3 py-2"
+          >
+            <option value="ALL">All Suppliers</option>
+            <option value="668">668</option>
+            <option value="FG">FG</option>
+            <option value="SK">SK</option>
+            <option value="GS">GS</option>
           </select>
 
           <input

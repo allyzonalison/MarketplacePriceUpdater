@@ -8,8 +8,6 @@ const calculateSellingPrice = (
   gramRange: string,
   pricePerGram: number
 ): number => {
-  // Products without a range (ex. "1.00")
-  // are manually priced and should not be calculated.
   if (!gramRange.includes("-")) {
     throw new Error("Product does not have a gram range.");
   }
@@ -21,11 +19,13 @@ const calculateSellingPrice = (
 
 export interface ApplyGroupPriceInput {
   group: PriceGroup;
+  supplier: string;
   pricePerGram: number;
 }
 
 export const previewGroupPrice = async ({
   group,
+  supplier,
   pricePerGram,
 }: ApplyGroupPriceInput) => {
   const products = await prisma.product.findMany();
@@ -37,13 +37,16 @@ export const previewGroupPrice = async ({
       continue;
     }
 
-    const productGroup = getPriceGroup(product.productName);
+    if (getPriceGroup(product.productName) !== group) {
+      continue;
+    }
 
-    if (productGroup !== group) {
+    if (supplier !== "ALL" && product.supplier !== supplier) {
       continue;
     }
 
     const newPrice = calculateSellingPrice(product.gramRange, pricePerGram);
+
     previewProducts.push({
       ...product,
       price: new Prisma.Decimal(newPrice),
@@ -56,16 +59,50 @@ export const previewGroupPrice = async ({
 
 export const applyGroupPrice = async ({
   group,
+  supplier,
   pricePerGram,
 }: ApplyGroupPriceInput) => {
   const io = getSocketServer();
+
   const products = await prisma.product.findMany();
 
-  const productsToUpdate = products.filter((product) => {
-    if (product.isManualPrice) return false;
+  console.log("Selected supplier:", supplier);
 
-    return getPriceGroup(product.productName) === group;
+  const productsToUpdate = products.filter((product) => {
+    if (product.isManualPrice) {
+      return false;
+    }
+
+    if (getPriceGroup(product.productName) !== group) {
+      return false;
+    }
+
+    console.log(
+      product.productName,
+      "| Database supplier:",
+      product.supplier,
+      "| Selected supplier:",
+      supplier
+    );
+
+    if (supplier !== "ALL" && product.supplier !== supplier) {
+      return false;
+    }
+
+    return true;
   });
+
+  console.log("================================");
+  console.log("Products that will be updated:");
+
+  productsToUpdate.forEach((p) => {
+    console.log(
+      `${p.productName} | Supplier: ${p.supplier} | Price: ${p.price}`
+    );
+  });
+
+  console.log("Total:", productsToUpdate.length);
+  console.log("================================");
 
   const total = productsToUpdate.length;
 
@@ -97,5 +134,5 @@ export const applyGroupPrice = async ({
 
   io.emit("price-update-complete");
 
-  console.log(`🎉 ${group} price update completed.`);
+  console.log(`🎉 ${group} (${supplier}) price update completed.`);
 };
