@@ -3,7 +3,7 @@ import { useEffect, useState } from "react";
 import ProductInformation from "./ProductInformation";
 import VariantToolbar from "./VariantToolbar";
 import VariantsGrid from "./VariantsGrid";
-import { calculateSellingPrice } from "./PriceCalculator";
+/*import { calculateSellingPrice } from "./PriceCalculator";*/
 import { validateProduct } from "./validateProduct";
 
 import type { Product } from "../../../types/product";
@@ -315,7 +315,7 @@ const ProductModal = ({
       rows: rows.map((row) => ({
         ...row,
 
-        sellingPrice: calculateSellingPrice(row.grams, row.pricePerGram),
+        sellingPrice: row.sellingPrice,
       })),
     };
 
@@ -334,8 +334,8 @@ const ProductModal = ({
               supplier: row.supplier,
               gramRange: row.grams,
 
-              pricePerGram: row.pricePerGram ?? 0,
-              price: calculateSellingPrice(row.grams, row.pricePerGram) ?? 0,
+              pricePerGram: row.pricePerGram == null ? null : row.pricePerGram,
+              price: row.sellingPrice ?? 0,
 
               stock: row.stock,
 
@@ -375,9 +375,9 @@ const ProductModal = ({
                   supplier: row.supplier,
 
                   grams: row.grams,
-                  pricePerGram: row.pricePerGram,
-                  sellingPrice:
-                    calculateSellingPrice(row.grams, row.pricePerGram) ?? 0,
+                  pricePerGram:
+                    row.pricePerGram == null ? null : Number(row.pricePerGram),
+                  sellingPrice: row.sellingPrice ?? 0,
 
                   stock: row.stock,
                 },

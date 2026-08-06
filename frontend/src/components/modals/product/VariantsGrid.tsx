@@ -40,7 +40,15 @@ const VariantsGrid = ({
           checkboxSelection: true,
           headerCheckboxSelection: false,
           width: 55,
-          editable: false,
+          editable: (params) => {
+            const row = params.data;
+
+            return (
+              !row.grams?.trim() ||
+              !row.pricePerGram ||
+              Number(row.pricePerGram) <= 0
+            );
+          },
           pinned: "left",
         },
 
@@ -69,6 +77,12 @@ const VariantsGrid = ({
           field: "pricePerGram",
           width: 130,
           editable: true,
+
+          valueParser: (params) => {
+            if (params.newValue === "") return null;
+            return Number(params.newValue);
+          },
+
           cellStyle: (params) =>
             isPositiveNumber(params.value)
               ? null
@@ -78,7 +92,15 @@ const VariantsGrid = ({
           headerName: "Selling Price",
           field: "sellingPrice",
           width: 130,
-          editable: false,
+          editable: (params) => {
+            const row = params.data;
+
+            return (
+              !row.grams?.trim() ||
+              !row.pricePerGram ||
+              Number(row.pricePerGram) <= 0
+            );
+          },
         },
         {
           headerName: "Stock",
@@ -193,6 +215,11 @@ const VariantsGrid = ({
           field: "pricePerGram",
           flex: 1,
           editable: true,
+          valueParser: (params) => {
+            if (params.newValue === "") return null;
+            return Number(params.newValue);
+          },
+
           cellStyle: (params) =>
             isPositiveNumber(params.value)
               ? null
@@ -202,7 +229,19 @@ const VariantsGrid = ({
           headerName: "Selling Price",
           field: "sellingPrice",
           flex: 1,
-          editable: false,
+          editable: (params) => {
+            const row = params.data;
+
+            return (
+              !row.grams?.trim() ||
+              !row.pricePerGram ||
+              Number(row.pricePerGram) <= 0
+            );
+          },
+          valueParser: (params) => {
+            if (params.newValue === "") return null;
+            return Number(params.newValue);
+          },
         },
         {
           headerName: "Stock",
@@ -217,11 +256,22 @@ const VariantsGrid = ({
   const handleCellValueChanged = (event: CellValueChangedEvent<VariantRow>) => {
     const updatedRow: VariantRow = {
       ...event.data,
-      sellingPrice: calculateSellingPrice(
-        event.data.grams,
-        event.data.pricePerGram
-      ),
+
+      // Convert empty input to null
+      pricePerGram: event.data.pricePerGram,
     };
+
+    const hasFormula =
+      updatedRow.grams.trim() !== "" &&
+      updatedRow.pricePerGram !== null &&
+      updatedRow.pricePerGram > 0;
+
+    if (hasFormula) {
+      updatedRow.sellingPrice = calculateSellingPrice(
+        updatedRow.grams,
+        updatedRow.pricePerGram
+      );
+    }
 
     const updatedRows = rows.map((row) =>
       row.clientId === updatedRow.clientId ? updatedRow : row

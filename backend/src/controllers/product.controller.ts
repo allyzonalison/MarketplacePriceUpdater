@@ -1,3 +1,4 @@
+import { Prisma } from "@prisma/client";
 import { Request, Response } from "express";
 
 import {
@@ -63,9 +64,25 @@ export const patchProduct = async (req: Request, res: Response) => {
   try {
     const id = Number(req.params.id);
 
-    console.log(req.body);
+    const data = {
+      ...req.body,
 
-    const updatedProduct = await updateProduct(id, req.body);
+      pricePerGram:
+        req.body.pricePerGram === "" ||
+        req.body.pricePerGram === null ||
+        req.body.pricePerGram === undefined
+          ? null
+          : new Prisma.Decimal(req.body.pricePerGram),
+
+      gramRange: req.body.gramRange === "" ? null : req.body.gramRange,
+
+      price:
+        req.body.price === null || req.body.price === undefined
+          ? new Prisma.Decimal(0)
+          : new Prisma.Decimal(req.body.price),
+    };
+
+    const updatedProduct = await updateProduct(id, data);
 
     res.json(updatedProduct);
   } catch (error) {

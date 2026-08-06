@@ -31,13 +31,39 @@ export function validateProduct(
       errors.push(`Row ${rowNo}: Supplier is required.`);
     }
 
-    if (!isValidWeightRange(row.grams)) {
+    // Variation Name is required
+    if (!row.variationName.trim()) {
+      errors.push(`Row ${rowNo}: Variation Name is required.`);
+    }
+
+    // Selling Price is required
+    if (!isPositiveNumber(row.sellingPrice)) {
+      errors.push(`Row ${rowNo}: Invalid selling price.`);
+    }
+
+    // Gram Range is OPTIONAL
+    if (row.grams.trim() !== "" && !isValidWeightRange(row.grams)) {
       errors.push(`Row ${rowNo}: Invalid grams format.`);
     }
 
-    if (!isPositiveNumber(row.pricePerGram)) {
+    // Price Per Gram is OPTIONAL
+    if (
+      row.pricePerGram !== null &&
+      row.pricePerGram !== undefined &&
+      row.pricePerGram !== 0 &&
+      !isPositiveNumber(row.pricePerGram)
+    ) {
       errors.push(`Row ${rowNo}: Invalid price per gram.`);
     }
+
+    /*
+    if (
+      String(row.pricePerGram).trim() !== "" &&
+      !isPositiveNumber(row.pricePerGram)
+    ) {
+      errors.push(`Row ${rowNo}: Invalid price per gram.`);
+    }
+      */
 
     if (!isWholeNumber(row.stock)) {
       errors.push(`Row ${rowNo}: Invalid stock.`);

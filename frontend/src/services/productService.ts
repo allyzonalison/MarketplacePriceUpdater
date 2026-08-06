@@ -26,7 +26,13 @@ export const updateProduct = async (
   id: number,
   data: Partial<Product>
 ): Promise<Product> => {
-  const response = await api.patch(`/products/${id}`, data);
+  const payload = {
+    ...data,
+    pricePerGram: data.pricePerGram,
+    gramRange: data.gramRange?.trim() === "" ? null : data.gramRange,
+  };
+
+  const response = await api.patch(`/products/${id}`, payload);
   return response.data;
 };
 
