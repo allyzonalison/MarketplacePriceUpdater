@@ -44,10 +44,6 @@ const VariantsGrid = ({
           pinned: "left",
         },
 
-        // =====================
-        // Main
-        // =====================
-
         {
           headerName: "Variation",
           field: "variationName",
@@ -65,7 +61,7 @@ const VariantsGrid = ({
           editable: true,
           cellStyle: (params) =>
             isValidWeightRange(params.value)
-              ? {}
+              ? null
               : { backgroundColor: "#FEE2E2" },
         },
         {
@@ -75,7 +71,7 @@ const VariantsGrid = ({
           editable: true,
           cellStyle: (params) =>
             isPositiveNumber(params.value)
-              ? {}
+              ? null
               : { backgroundColor: "#FEE2E2" },
         },
         {
@@ -90,12 +86,8 @@ const VariantsGrid = ({
           width: 100,
           editable: true,
           cellStyle: (params) =>
-            isWholeNumber(params.value) ? {} : { backgroundColor: "#FEE2E2" },
+            isWholeNumber(params.value) ? null : { backgroundColor: "#FEE2E2" },
         },
-
-        // =====================
-        // Shopee
-        // =====================
 
         {
           headerName: "Shopee Product ID",
@@ -107,10 +99,6 @@ const VariantsGrid = ({
           field: "variationIdShopee",
           width: 180,
         },
-
-        // =====================
-        // Lazada
-        // =====================
 
         {
           headerName: "Lazada Product ID",
@@ -131,7 +119,6 @@ const VariantsGrid = ({
           headerName: "Lazada Qty",
           field: "quantityLazada",
           width: 120,
-
           valueParser: (params) => {
             if (params.newValue === "") return null;
             return Number(params.newValue);
@@ -142,10 +129,6 @@ const VariantsGrid = ({
           field: "variationNameLazada",
           width: 180,
         },
-
-        // =====================
-        // TikTok
-        // =====================
 
         {
           headerName: "TikTok Product ID",
@@ -166,7 +149,6 @@ const VariantsGrid = ({
           headerName: "TikTok Qty",
           field: "quantityTiktok",
           width: 120,
-
           valueParser: (params) => {
             if (params.newValue === "") return null;
             return Number(params.newValue);
@@ -203,7 +185,7 @@ const VariantsGrid = ({
           editable: true,
           cellStyle: (params) =>
             isValidWeightRange(params.value)
-              ? {}
+              ? null
               : { backgroundColor: "#FEE2E2" },
         },
         {
@@ -213,7 +195,7 @@ const VariantsGrid = ({
           editable: true,
           cellStyle: (params) =>
             isPositiveNumber(params.value)
-              ? {}
+              ? null
               : { backgroundColor: "#FEE2E2" },
         },
         {
@@ -228,13 +210,11 @@ const VariantsGrid = ({
           flex: 0.8,
           editable: true,
           cellStyle: (params) =>
-            isWholeNumber(params.value) ? {} : { backgroundColor: "#FEE2E2" },
+            isWholeNumber(params.value) ? null : { backgroundColor: "#FEE2E2" },
         },
       ];
 
   const handleCellValueChanged = (event: CellValueChangedEvent<VariantRow>) => {
-    console.log("Changed field:", event.colDef.field);
-    console.log("New data:", event.data);
     const updatedRow: VariantRow = {
       ...event.data,
       sellingPrice: calculateSellingPrice(
@@ -279,7 +259,6 @@ const VariantsGrid = ({
           editable: true,
           resizable: true,
           sortable: true,
-          headerName: "Lazada Qty",
           filter: true,
           minWidth: 120,
         }}
