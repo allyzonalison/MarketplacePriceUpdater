@@ -45,6 +45,10 @@ export const previewGroupPrice = async ({
       continue;
     }
 
+    if (!product.gramRange) {
+      continue;
+    }
+
     const newPrice = calculateSellingPrice(product.gramRange, pricePerGram);
 
     previewProducts.push({
@@ -108,6 +112,10 @@ export const applyGroupPrice = async ({
 
   let completed = 0;
   for (const product of productsToUpdate) {
+    if (!product.gramRange) {
+      continue;
+    }
+
     const newPrice = calculateSellingPrice(product.gramRange, pricePerGram);
 
     await prisma.product.update({
