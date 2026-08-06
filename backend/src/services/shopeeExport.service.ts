@@ -1,5 +1,6 @@
 import ExcelJS from "exceljs";
 import prisma from "../lib/prisma.js";
+import { getSocketServer } from "../lib/socket.js";
 
 export const exportShopee = async (buffer: Buffer) => {
   const workbook = new ExcelJS.Workbook();
@@ -7,8 +8,11 @@ export const exportShopee = async (buffer: Buffer) => {
   await workbook.xlsx.load(buffer as any);
 
   const worksheet = workbook.worksheets[0];
+  const io = getSocketServer();
 
   const products = await prisma.product.findMany();
+  const total = worksheet.rowCount - 6;
+  let completed = 0;
 
   console.log(`Loaded ${products.length} products from database.`);
 
@@ -58,7 +62,16 @@ export const exportShopee = async (buffer: Buffer) => {
 
     row.getCell("G").value = Number(product.price);
     row.getCell("I").value = product.stock;
+    completed++;
+
+    io.emit("price-update-progress", {
+      completed,
+      total,
+      percent: Math.round((completed / total) * 100),
+    });
   }
+
+  io.emit("price-update-complete");
 
   return workbook.xlsx.writeBuffer();
 };

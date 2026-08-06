@@ -4,8 +4,9 @@ import Sidebar from "../components/sidebar/Sidebar";
 import Toolbar from "../components/layout/Header";
 import ProductTable from "../components/table/ProductTable";
 import ProductModal from "../components/modals/product/ProductModal";
+import ConfirmModal from "../components/common/ConfirmModal";
 
-import { getProducts } from "../services/productService";
+import { getProducts, deleteProduct } from "../services/productService";
 
 import type { Product } from "../types/product";
 
@@ -25,6 +26,8 @@ const ProductsPage = () => {
     : [];
 
   const [isProductModalOpen, setIsProductModalOpen] = useState(false);
+
+  const [isDeleteModalOpen, setIsDeleteModalOpen] = useState(false);
 
   const refreshProducts = async () => {
     try {
@@ -48,10 +51,6 @@ const ProductsPage = () => {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
-  useEffect(() => {
-    console.log(selectedProduct);
-  }, [selectedProduct]);
-
   const handlePreview = (previewProducts: Product[]) => {
     setProducts((currentProducts) =>
       currentProducts.map((product) => {
@@ -68,6 +67,23 @@ const ProductsPage = () => {
         };
       })
     );
+  };
+
+  const handleDeleteProduct = async () => {
+    if (!selectedProduct) return;
+
+    try {
+      await deleteProduct(selectedProduct.id);
+
+      await refreshProducts();
+
+      setSelectedProduct(null);
+
+      setIsDeleteModalOpen(false);
+    } catch (error) {
+      console.error(error);
+      alert("Failed to delete product.");
+    }
   };
 
   return (
@@ -95,7 +111,12 @@ const ProductsPage = () => {
               setIsProductModalOpen(true);
             }}
             onDeleteProduct={() => {
-              alert("Delete will be implemented next.");
+              if (!selectedProduct) {
+                alert("Please select a product first.");
+                return;
+              }
+
+              setIsDeleteModalOpen(true);
             }}
           />
 
@@ -118,6 +139,25 @@ const ProductsPage = () => {
         onClose={() => setIsProductModalOpen(false)}
         onSaveSuccess={refreshProducts}
       />
+
+      <ConfirmModal
+        isOpen={isDeleteModalOpen}
+        title="Delete Product"
+        description="Are you sure you want to delete this product? This action cannot be undone."
+        confirmText="Delete"
+        cancelText="Cancel"
+        danger
+        onConfirm={handleDeleteProduct}
+        onCancel={() => setIsDeleteModalOpen(false)}
+      >
+        <div className="rounded-lg bg-gray-100 p-4">
+          <p className="font-semibold">{selectedProduct?.productName}</p>
+
+          <p className="mt-1 text-sm text-gray-500">
+            Variation: {selectedProduct?.variationNameShopee}
+          </p>
+        </div>
+      </ConfirmModal>
     </>
   );
 };

@@ -1,5 +1,6 @@
 import { useRef, useState } from "react";
 import { X } from "lucide-react";
+import { useProgress } from "../../hooks/useProgress";
 
 interface MarketplaceExportModalProps {
   isOpen: boolean;
@@ -18,6 +19,7 @@ const MarketplaceExportModal = ({
   const [loading, setLoading] = useState(false);
 
   const inputRef = useRef<HTMLInputElement>(null);
+  const { showProgress, hideProgress } = useProgress();
 
   if (!isOpen) return null;
 
@@ -29,6 +31,13 @@ const MarketplaceExportModal = ({
 
     try {
       setLoading(true);
+
+      // Close the export modal first
+      onClose();
+
+      // Show the progress modal
+      showProgress("Generating Shopee Export...");
+
       await onGenerate(files);
 
       // Clear selected files after successful generation
@@ -37,12 +46,11 @@ const MarketplaceExportModal = ({
       if (inputRef.current) {
         inputRef.current.value = "";
       }
-
-      onClose();
     } catch (error) {
       console.error(error);
       alert("Failed to generate export.");
     } finally {
+      hideProgress();
       setLoading(false);
     }
   };

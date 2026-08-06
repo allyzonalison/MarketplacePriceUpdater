@@ -43,7 +43,7 @@ const Toolbar = ({
 
             <optgroup label="Categories">
               <option value="Earrings">Earrings</option>
-              <option value="Pendants">Pendants</option>
+              <option value="Pendant">Pendants</option>
               <option value="Bracelet_Anklet">Bracelet_Anklet</option>
               <option value="Necklace">Necklace</option>
               <option value="Ring">Ring</option>

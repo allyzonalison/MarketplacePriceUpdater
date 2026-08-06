@@ -34,7 +34,7 @@ const ProductInformation = ({
           >
             <option value="">Select Category</option>
             <option>Earrings</option>
-            <option>Pendants</option>
+            <option>Pendant</option>
             <option>Bracelet_Anklet</option>
             <option>Necklace</option>
             <option>Ring</option>
