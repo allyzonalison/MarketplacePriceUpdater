@@ -24,6 +24,18 @@ setSocketServer(io);
 io.on("connection", (socket) => {
   console.log(`🟢 Client connected: ${socket.id}`);
 
+  socket.emit("test-event", {
+    message: "Hello from backend",
+  });
+
+  socket.emit("price-update-progress", {
+    completed: 1,
+    total: 10,
+    percent: 10,
+  });
+
+  socket.emit("price-update-complete");
+
   socket.on("disconnect", () => {
     console.log(`🔴 Client disconnected: ${socket.id}`);
   });

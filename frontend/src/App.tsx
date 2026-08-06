@@ -11,13 +11,7 @@ function AppContent() {
     <>
       <ProductsPage />
 
-      <ProgressModal
-        visible={progress.visible}
-        title={progress.title}
-        completed={progress.completed}
-        total={progress.total}
-        percent={progress.percent}
-      />
+      <ProgressModal visible={progress.visible} title={progress.title} />
     </>
   );
 }

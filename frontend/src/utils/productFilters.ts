@@ -5,7 +5,7 @@ export function matchesFilter(product: Product, filter: string): boolean {
 
   // Categories
   if (
-    ["Earrings", "Pendants", "Bracelet_Anklet", "Necklace", "Ring"].includes(
+    ["Earrings", "Pendant", "Bracelet_Anklet", "Necklace", "Ring"].includes(
       filter
     )
   ) {

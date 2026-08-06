@@ -21,7 +21,7 @@ const Sidebar = ({ onPreview, onApplySuccess }: SidebarProps) => {
 
   const [isShopeeModalOpen, setIsShopeeModalOpen] = useState(false);
 
-  const { showProgress } = useProgress();
+  const { showProgress, hideProgress } = useProgress();
 
   const handlePreview = async () => {
     if (!group || !pricePerGram) {
@@ -72,8 +72,12 @@ const Sidebar = ({ onPreview, onApplySuccess }: SidebarProps) => {
 
       await onApplySuccess();
 
+      hideProgress();
+
       alert("Prices applied successfully!");
     } catch (error) {
+      hideProgress();
+
       console.error(error);
       alert("Failed to apply prices.");
     } finally {
