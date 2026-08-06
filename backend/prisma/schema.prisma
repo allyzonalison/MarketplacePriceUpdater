@@ -8,39 +8,28 @@ datasource db {
 }
 
 model Product {
-  id               Int      @id @default(autoincrement())
-
-  masterCategory   String
-  productName      String
-
-  gramRange        String
-  pricePerGram     Decimal
-  price            Decimal
-
-  isManualPrice    Boolean  @default(false)
-
-  stock            Int
-  supplier         String
-
-  // Shopee
-  variationNameShopee String?
-  productIdShopee     String?
-  variationIdShopee   String?
-
-  // Lazada
-  variationNameLazada String?
-  productIdLazada     String?
-  skuIdLazada         String?
-  keyLazada           String?
-  quantityLazada      Int?
-
-  // TikTok
-  variationNameTiktok String?
-  productIdTiktok     String?
-  skuIdTiktok         String?
+  id                  Int      @id @default(autoincrement())
+  createdAt           DateTime @default(now())
+  updatedAt           DateTime @updatedAt
   categoryTiktok      String?
+  keyLazada           String?
+  masterCategory      String
+  price               Decimal
+  pricePerGram        Decimal?
+  productIdLazada     String?
+  productIdShopee     String?
+  productIdTiktok     String?
+  productName         String
+  quantityLazada      Int?
   quantityTiktok      Int?
-
-  createdAt        DateTime @default(now())
-  updatedAt        DateTime @updatedAt
+  skuIdLazada         String?
+  skuIdTiktok         String?
+  stock               Int
+  supplier            String
+  variationIdShopee   String?
+  variationNameLazada String?
+  variationNameShopee String?
+  variationNameTiktok String?
+  gramRange           String
+  isManualPrice       Boolean  @default(false)
 }
