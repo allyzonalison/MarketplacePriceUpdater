@@ -32,9 +32,23 @@ export const exportShopee = async (buffer: Buffer) => {
     );
 
     if (!product) {
-      console.log(
-        `❌ No Match | Product: "${productName}" | Variation: "${variationName}"`
+      console.log("====================================");
+      console.log("❌ NO MATCH");
+      console.log("Excel Product:", JSON.stringify(productName));
+      console.log("Excel Variation:", JSON.stringify(variationName));
+
+      const candidates = products.filter(
+        (p) => normalize(p.productName) === normalize(productName)
       );
+
+      console.log(
+        "Possible matches:",
+        candidates.map((c) => ({
+          product: c.productName,
+          variation: c.variationNameShopee,
+        }))
+      );
+
       continue;
     }
 
