@@ -3,7 +3,7 @@ import { io } from "socket.io-client";
 
 import { ProgressContext, type ProgressState } from "./progressContext";
 
-const socket = io("http://localhost:3001");
+const socket = io("https://marketplacepriceupdater.onrender.com");
 
 export const ProgressProvider = ({ children }: { children: ReactNode }) => {
   const [progress, setProgress] = useState<ProgressState>({
