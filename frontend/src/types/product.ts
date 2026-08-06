@@ -3,9 +3,14 @@ export interface Product {
 
   masterCategory: string;
   productName: string;
-  gramRange: string;
 
-  pricePerGram: number;
+  // Optional for manual-priced products
+  gramRange: string | null;
+
+  // Optional for manual-priced products
+  pricePerGram: number | null;
+
+  // Always required
   price: number;
 
   previewPrice?: number;
@@ -15,16 +20,19 @@ export interface Product {
   stock: number;
   supplier: string;
 
+  // Shopee
   variationNameShopee: string | null;
   productIdShopee: string | null;
   variationIdShopee: string | null;
 
+  // Lazada
   variationNameLazada: string | null;
   productIdLazada: string | null;
   skuIdLazada: string | null;
   keyLazada: string | null;
   quantityLazada: number | null;
 
+  // TikTok
   variationNameTiktok: string | null;
   productIdTiktok: string | null;
   skuIdTiktok: string | null;

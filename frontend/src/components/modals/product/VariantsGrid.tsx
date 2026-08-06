@@ -34,21 +34,25 @@ const VariantsGrid = ({
   onRowsChange,
   onSelectedRowChange,
 }: Props) => {
+  const canEditSellingPrice = (row: VariantRow | undefined): boolean => {
+    if (!row) {
+      return false;
+    }
+
+    return (
+      row.grams.trim() === "" ||
+      row.pricePerGram === null ||
+      row.pricePerGram <= 0
+    );
+  };
+
   const columnDefs: ColDef<VariantRow>[] = isEditMode
     ? [
         {
           checkboxSelection: true,
           headerCheckboxSelection: false,
           width: 55,
-          editable: (params) => {
-            const row = params.data;
-
-            return (
-              !row.grams?.trim() ||
-              !row.pricePerGram ||
-              Number(row.pricePerGram) <= 0
-            );
-          },
+          editable: false,
           pinned: "left",
         },
 
@@ -92,14 +96,10 @@ const VariantsGrid = ({
           headerName: "Selling Price",
           field: "sellingPrice",
           width: 130,
-          editable: (params) => {
-            const row = params.data;
-
-            return (
-              !row.grams?.trim() ||
-              !row.pricePerGram ||
-              Number(row.pricePerGram) <= 0
-            );
+          editable: (params) => canEditSellingPrice(params.data),
+          valueParser: (params) => {
+            if (params.newValue === "") return null;
+            return Number(params.newValue);
           },
         },
         {
@@ -229,15 +229,7 @@ const VariantsGrid = ({
           headerName: "Selling Price",
           field: "sellingPrice",
           flex: 1,
-          editable: (params) => {
-            const row = params.data;
-
-            return (
-              !row.grams?.trim() ||
-              !row.pricePerGram ||
-              Number(row.pricePerGram) <= 0
-            );
-          },
+          editable: (params) => canEditSellingPrice(params.data),
           valueParser: (params) => {
             if (params.newValue === "") return null;
             return Number(params.newValue);

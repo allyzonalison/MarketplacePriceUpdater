@@ -123,34 +123,38 @@ const ProductTable = ({
 
       updatedData.gramRange = gramRange;
 
-      const newSellingPrice = calculateSellingPrice(
-        gramRange,
-        Number(event.data.pricePerGram)
-      );
+      if (gramRange && event.data.pricePerGram != null) {
+        const newSellingPrice = calculateSellingPrice(
+          gramRange,
+          Number(event.data.pricePerGram)
+        );
 
-      if (newSellingPrice !== null) {
-        updatedData.price = newSellingPrice;
+        if (newSellingPrice !== null) {
+          updatedData.price = newSellingPrice;
 
-        event.data.price = newSellingPrice;
-        event.node.setDataValue("price", newSellingPrice);
+          event.data.price = newSellingPrice;
+          event.node.setDataValue("price", newSellingPrice);
+        }
       }
     }
 
     if (field === "pricePerGram") {
-      const pricePerGram = Number(event.data.pricePerGram);
+      const pricePerGram = event.data.pricePerGram;
 
       updatedData.pricePerGram = pricePerGram;
 
-      const newSellingPrice = calculateSellingPrice(
-        event.data.gramRange,
-        pricePerGram
-      );
+      if (pricePerGram != null && event.data.gramRange) {
+        const newSellingPrice = calculateSellingPrice(
+          event.data.gramRange,
+          pricePerGram
+        );
 
-      if (newSellingPrice !== null) {
-        updatedData.price = newSellingPrice;
+        if (newSellingPrice !== null) {
+          updatedData.price = newSellingPrice;
 
-        event.data.price = newSellingPrice;
-        event.node.setDataValue("price", newSellingPrice);
+          event.data.price = newSellingPrice;
+          event.node.setDataValue("price", newSellingPrice);
+        }
       }
     }
 

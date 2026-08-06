@@ -97,7 +97,7 @@ const ProductModal = ({
           variationName: product.variationNameShopee ?? "",
           supplier: product.supplier,
 
-          grams: product.gramRange,
+          grams: product.gramRange ?? "",
           pricePerGram: Number(product.pricePerGram),
           sellingPrice: Number(product.price),
 
@@ -332,9 +332,9 @@ const ProductModal = ({
               masterCategory: category,
 
               supplier: row.supplier,
-              gramRange: row.grams,
+              gramRange: row.grams.trim() === "" ? undefined : row.grams,
 
-              pricePerGram: row.pricePerGram == null ? null : row.pricePerGram,
+              pricePerGram: row.pricePerGram ?? undefined,
               price: row.sellingPrice ?? 0,
 
               stock: row.stock,

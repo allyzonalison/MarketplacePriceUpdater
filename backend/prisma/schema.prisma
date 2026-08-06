@@ -30,6 +30,6 @@ model Product {
   variationNameLazada String?
   variationNameShopee String?
   variationNameTiktok String?
-  gramRange           String
+  gramRange           String?
   isManualPrice       Boolean  @default(false)
 }
