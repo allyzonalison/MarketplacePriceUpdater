@@ -180,16 +180,34 @@ const Sidebar = ({ onPreview, onApplySuccess }: SidebarProps) => {
         marketplace="Shopee"
         onClose={() => setIsShopeeModalOpen(false)}
         onGenerate={async (files) => {
-          const blob = await exportShopee(files);
+          try {
+            console.log("1. Calling backend...");
 
-          const url = window.URL.createObjectURL(blob);
+            const blob = await exportShopee(files);
 
-          const a = document.createElement("a");
-          a.href = url;
-          a.download = "Shopee_Updated.zip";
-          a.click();
+            console.log("2. Blob received:", blob);
+            console.log("Blob size:", blob.size);
+            console.log("Blob type:", blob.type);
 
-          window.URL.revokeObjectURL(url);
+            const url = window.URL.createObjectURL(blob);
+
+            console.log("3. URL:", url);
+
+            const a = document.createElement("a");
+            a.href = url;
+            a.download = "Shopee_Updated.zip";
+
+            document.body.appendChild(a);
+            a.click();
+            document.body.removeChild(a);
+
+            window.URL.revokeObjectURL(url);
+
+            console.log("4. Download finished");
+          } catch (err) {
+            console.error("EXPORT ERROR:", err);
+            throw err;
+          }
         }}
       />
     </>
