@@ -1,9 +1,8 @@
 import { useEffect, useMemo, useState, type ReactNode } from "react";
-import { io } from "socket.io-client";
 
 import { ProgressContext, type ProgressState } from "./progressContext";
 
-const socket = io("https://marketplacepriceupdater.onrender.com");
+import socket from "../services/socket";
 
 export const ProgressProvider = ({ children }: { children: ReactNode }) => {
   const [progress, setProgress] = useState<ProgressState>({
