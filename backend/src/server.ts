@@ -4,13 +4,16 @@ import { Server } from "socket.io";
 import app from "./app.js";
 import { setSocketServer } from "./lib/socket.js";
 
-const PORT = 3001;
+const PORT = Number(process.env.PORT) || 3001;
 
 const httpServer = http.createServer(app);
 
 const io = new Server(httpServer, {
   cors: {
-    origin: "http://localhost:5173",
+    origin: [
+      "http://localhost:5173",
+      "https://marketplace-price-updater-delta.vercel.app",
+    ],
     methods: ["GET", "POST", "PATCH", "DELETE"],
   },
 });
@@ -27,5 +30,5 @@ io.on("connection", (socket) => {
 });
 
 httpServer.listen(PORT, () => {
-  console.log(`🚀 Server running on http://localhost:${PORT}`);
+  console.log(`🚀 Server running on port ${PORT}`);
 });
