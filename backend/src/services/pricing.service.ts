@@ -107,8 +107,7 @@ export const applyGroupPrice = async ({
   const total = productsToUpdate.length;
 
   let completed = 0;
-
-  const updates = productsToUpdate.map(async (product) => {
+  for (const product of productsToUpdate) {
     const newPrice = calculateSellingPrice(product.gramRange, pricePerGram);
 
     await prisma.product.update({
@@ -123,14 +122,16 @@ export const applyGroupPrice = async ({
 
     completed++;
 
-    io.emit("price-update-progress", {
+    const progress = {
       completed,
       total,
       percent: Math.round((completed / total) * 100),
-    });
-  });
+    };
 
-  await Promise.all(updates);
+    console.log("📤 Sending progress:", progress);
+
+    io.emit("price-update-progress", progress);
+  }
 
   io.emit("price-update-complete");
 

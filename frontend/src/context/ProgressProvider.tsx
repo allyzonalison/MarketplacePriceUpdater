@@ -15,6 +15,14 @@ export const ProgressProvider = ({ children }: { children: ReactNode }) => {
   });
 
   useEffect(() => {
+    socket.on("connect", () => {
+      console.log("✅ Connected:", socket.id);
+    });
+
+    socket.on("disconnect", () => {
+      console.log("❌ Disconnected");
+    });
+
     socket.on("price-update-progress", (data) => {
       console.log("🟢 Progress received:", data);
 
@@ -42,6 +50,8 @@ export const ProgressProvider = ({ children }: { children: ReactNode }) => {
     });
 
     return () => {
+      socket.off("connect");
+      socket.off("disconnect");
       socket.off("price-update-progress");
       socket.off("price-update-complete");
     };
