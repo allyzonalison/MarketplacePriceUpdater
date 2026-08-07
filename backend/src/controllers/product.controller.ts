@@ -52,10 +52,11 @@ export const createNewProduct = async (req: Request, res: Response) => {
 
     res.status(201).json(product);
   } catch (error) {
+    console.error("CREATE PRODUCT ERROR:");
     console.error(error);
 
     res.status(500).json({
-      message: "Failed to create product.",
+      message: String(error),
     });
   }
 };
