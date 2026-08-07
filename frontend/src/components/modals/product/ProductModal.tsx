@@ -315,7 +315,7 @@ const ProductModal = ({
       rows: rows.map((row) => ({
         ...row,
 
-        sellingPrice: row.sellingPrice,
+        sellingPrice: row.sellingPrice ?? 0,
       })),
     };
 
