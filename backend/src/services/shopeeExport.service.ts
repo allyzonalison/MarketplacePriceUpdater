@@ -19,7 +19,9 @@ export const exportShopee = async (buffer: Buffer) => {
   for (let rowNumber = 7; rowNumber <= worksheet.rowCount; rowNumber++) {
     const row = worksheet.getRow(rowNumber);
 
+    const shopeeProductId = row.getCell("A").text.trim();
     const productName = row.getCell("B").text.trim();
+    const shopeeVariationId = row.getCell("C").text.trim();
     const variationName = row.getCell("D").text.trim();
 
     const normalize = (value: string | null | undefined) =>
@@ -59,6 +61,26 @@ export const exportShopee = async (buffer: Buffer) => {
     console.log(
       `✅ Match | Product: "${product.productName}" | Variation: "${product.variationNameShopee}" | New Price: ${product.price}`
     );
+
+    const shouldUpdate =
+      product.productIdShopee !== shopeeProductId ||
+      product.variationIdShopee !== shopeeVariationId ||
+      normalize(product.variationNameShopee) !== normalize(variationName);
+
+    if (shouldUpdate) {
+      await prisma.product.update({
+        where: {
+          id: product.id,
+        },
+        data: {
+          productIdShopee: shopeeProductId,
+          variationIdShopee: shopeeVariationId,
+          variationNameShopee: variationName === "" ? null : variationName,
+        },
+      });
+
+      console.log(`🔄 Updated Shopee IDs for ${product.productName}`);
+    }
 
     row.getCell("G").value = Number(product.price);
     row.getCell("I").value = product.stock;

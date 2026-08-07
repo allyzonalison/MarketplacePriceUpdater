@@ -389,20 +389,7 @@ const ProductModal = ({
         setDeletedVariantIds([]);
         alert("Product updated successfully!");
       } else {
-        const response = await fetch(
-          "https://marketplacepriceupdater.onrender.com",
-          {
-            method: "POST",
-            headers: {
-              "Content-Type": "application/json",
-            },
-            body: JSON.stringify(payload),
-          }
-        );
-
-        if (!response.ok) {
-          throw new Error("Failed to save product.");
-        }
+        await createProduct(payload);
 
         alert("Product saved successfully!");
       }
