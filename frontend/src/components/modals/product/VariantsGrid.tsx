@@ -1,4 +1,5 @@
 import { AgGridReact } from "ag-grid-react";
+import { SUPPLIERS } from "../../../constants/suppliers";
 import { calculateSellingPrice } from "./PriceCalculator";
 import {
   AllCommunityModule,
@@ -65,6 +66,11 @@ const VariantsGrid = ({
           headerName: "Supplier",
           field: "supplier",
           width: 120,
+          editable: true,
+          cellEditor: "agSelectCellEditor",
+          cellEditorParams: {
+            values: SUPPLIERS,
+          },
         },
         {
           headerName: "Grams",
@@ -199,6 +205,11 @@ const VariantsGrid = ({
           headerName: "Supplier",
           field: "supplier",
           flex: 1,
+          editable: true,
+          cellEditor: "agSelectCellEditor",
+          cellEditorParams: {
+            values: SUPPLIERS,
+          },
         },
         {
           headerName: "Grams",
