@@ -224,6 +224,24 @@ const Sidebar = ({ onPreview, onApplySuccess }: SidebarProps) => {
             </button>
           </div>
         </div>
+
+        <hr className="my-8" />
+
+        <button
+          onClick={() => {
+            const confirmed = window.confirm(
+              "Are you sure you want to sign out?"
+            );
+
+            if (!confirmed) return;
+
+            localStorage.removeItem("token");
+            window.location.reload();
+          }}
+          className="w-full rounded-lg bg-red-600 py-3 font-semibold text-white transition hover:bg-red-700"
+        >
+          Sign Out
+        </button>
       </aside>
 
       <MarketplaceExportModal
