@@ -1,15 +1,18 @@
-import Login from "./pages/Login";
-
 import { ProgressProvider } from "./context/ProgressProvider";
 import ProgressModal from "./components/common/ProgressModal";
 import { useProgress } from "./hooks/useProgress";
 
+import ProductsPage from "./pages/ProductsPage";
+import Login from "./pages/Login";
+
 function AppContent() {
   const { progress } = useProgress();
 
+  const token = localStorage.getItem("token");
+
   return (
     <>
-      <Login />
+      {token ? <ProductsPage /> : <Login />}
 
       <ProgressModal visible={progress.visible} title={progress.title} />
     </>
