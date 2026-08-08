@@ -20,3 +20,15 @@ export const applyGroupPrice = async (
 ): Promise<void> => {
   await api.post("/prices/apply", data);
 };
+
+export interface CurrentPrices {
+  regularItems: number | null;
+  electroform: number | null;
+  rings24k: number | null;
+  coupleRings: number | null;
+}
+
+export const getCurrentPrices = async (): Promise<CurrentPrices> => {
+  const response = await api.get("/prices/current");
+  return response.data;
+};

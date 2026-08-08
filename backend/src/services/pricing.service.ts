@@ -145,3 +145,26 @@ export const applyGroupPrice = async ({
 
   console.log(`🎉 ${group} (${supplier}) price update completed.`);
 };
+
+export const getCurrentPrices = async () => {
+  const products = await prisma.product.findMany();
+
+  return {
+    regularItems:
+      products.find((p) => getPriceGroup(p.productName) === PriceGroup.REGULAR)
+        ?.pricePerGram ?? null,
+
+    electroform:
+      products.find(
+        (p) => getPriceGroup(p.productName) === PriceGroup.ELECTROFORM
+      )?.pricePerGram ?? null,
+
+    rings24k:
+      products.find((p) => getPriceGroup(p.productName) === PriceGroup.RING_24K)
+        ?.pricePerGram ?? null,
+
+    coupleRings:
+      products.find((p) => getPriceGroup(p.productName) === PriceGroup.COUPLE)
+        ?.pricePerGram ?? null,
+  };
+};

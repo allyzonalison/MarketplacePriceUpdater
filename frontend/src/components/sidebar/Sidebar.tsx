@@ -1,7 +1,9 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import {
   previewGroupPrice,
   applyGroupPrice,
+  getCurrentPrices,
+  type CurrentPrices,
 } from "../../services/pricingService";
 import { exportShopee } from "../../services/exportService";
 import MarketplaceExportModal from "../modals/MarketplaceExportModal";
@@ -19,9 +21,31 @@ const Sidebar = ({ onPreview, onApplySuccess }: SidebarProps) => {
   const [pricePerGram, setPricePerGram] = useState("");
   const [loading, setLoading] = useState(false);
 
+  const [currentPrices, setCurrentPrices] = useState<CurrentPrices | null>(
+    null
+  );
+
   const [isShopeeModalOpen, setIsShopeeModalOpen] = useState(false);
 
   const { showProgress, hideProgress } = useProgress();
+
+  const loadCurrentPrices = async () => {
+    try {
+      const prices = await getCurrentPrices();
+
+      console.log("Prices from API:", prices);
+      console.log("regularItems:", prices.regularItems);
+      console.log("Type:", typeof prices.regularItems);
+
+      setCurrentPrices(prices);
+    } catch (error) {
+      console.error(error);
+    }
+  };
+
+  useEffect(() => {
+    loadCurrentPrices();
+  }, []);
 
   const handlePreview = async () => {
     if (!group || !pricePerGram) {
@@ -71,6 +95,7 @@ const Sidebar = ({ onPreview, onApplySuccess }: SidebarProps) => {
       });
 
       await onApplySuccess();
+      await loadCurrentPrices();
 
       hideProgress();
 
@@ -150,22 +175,29 @@ const Sidebar = ({ onPreview, onApplySuccess }: SidebarProps) => {
           <div className="space-y-3 text-sm">
             <div className="flex justify-between">
               <span>Regular Items</span>
-              <span>₱9,000</span>
+              <span>
+                {" "}
+                ₱{currentPrices?.regularItems?.toLocaleString() ?? "-"}
+              </span>
             </div>
 
             <div className="flex justify-between">
               <span>Electroform</span>
-              <span>₱8,500</span>
+              <span>
+                ₱{currentPrices?.electroform?.toLocaleString() ?? "-"}
+              </span>
             </div>
 
             <div className="flex justify-between">
               <span>24K Gold Rings</span>
-              <span>₱9,500</span>
+              <span>₱{currentPrices?.rings24k?.toLocaleString() ?? "-"}</span>
             </div>
 
             <div className="flex justify-between">
               <span>Couple Rings</span>
-              <span>₱8,800</span>
+              <span>
+                ₱{currentPrices?.coupleRings?.toLocaleString() ?? "-"}
+              </span>
             </div>
           </div>
         </div>

@@ -1,11 +1,14 @@
 import { Request, Response } from "express";
 import {
-  applyGroupPrice,
   previewGroupPrice,
+  applyGroupPrice,
+  getCurrentPrices,
 } from "../services/pricing.service.js";
 
 export const applyPricesController = async (req: Request, res: Response) => {
   try {
+    console.log(req.body);
+
     const { group, supplier, pricePerGram } = req.body;
 
     await applyGroupPrice({
@@ -18,6 +21,7 @@ export const applyPricesController = async (req: Request, res: Response) => {
       message: "Prices updated successfully.",
     });
   } catch (error) {
+    console.error("===== APPLY PRICE ERROR =====");
     console.error(error);
 
     res.status(500).json({
@@ -42,6 +46,23 @@ export const previewPricesController = async (req: Request, res: Response) => {
 
     res.status(500).json({
       message: "Failed to preview prices.",
+    });
+  }
+};
+
+export const getCurrentPricesController = async (
+  _req: Request,
+  res: Response
+) => {
+  try {
+    const prices = await getCurrentPrices();
+
+    res.json(prices);
+  } catch (error) {
+    console.error(error);
+
+    res.status(500).json({
+      message: "Failed to load current prices.",
     });
   }
 };
