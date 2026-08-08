@@ -33,3 +33,10 @@ model Product {
   gramRange           String?
   isManualPrice       Boolean  @default(false)
 }
+
+model User {
+  id        Int      @id @default(autoincrement())
+  username  String   @unique
+  password  String
+  createdAt DateTime @default(now())
+}

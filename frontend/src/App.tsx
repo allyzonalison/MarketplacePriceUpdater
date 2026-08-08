@@ -1,4 +1,4 @@
-import ProductsPage from "./pages/ProductsPage";
+import Login from "./pages/Login";
 
 import { ProgressProvider } from "./context/ProgressProvider";
 import ProgressModal from "./components/common/ProgressModal";
@@ -9,7 +9,7 @@ function AppContent() {
 
   return (
     <>
-      <ProductsPage />
+      <Login />
 
       <ProgressModal visible={progress.visible} title={progress.title} />
     </>
