@@ -1,10 +1,21 @@
 interface ProgressModalProps {
   visible: boolean;
   title: string;
+  completed?: number;
+  total?: number;
+  percent?: number;
 }
 
-const ProgressModal = ({ visible, title }: ProgressModalProps) => {
-  if (!visible) return null;
+const ProgressModal = ({
+  visible,
+  title,
+  completed = 0,
+  total = 0,
+  percent = 0,
+}: ProgressModalProps) => {
+  if (!visible) {
+    return null;
+  }
 
   return (
     <div className="fixed inset-0 z-[9999] flex items-center justify-center bg-black/50">
@@ -15,8 +26,23 @@ const ProgressModal = ({ visible, title }: ProgressModalProps) => {
           Please wait while the system updates your products.
         </p>
 
-        <div className="mt-8 flex justify-center">
-          <div className="h-10 w-10 animate-spin rounded-full border-4 border-gray-300 border-t-blue-600"></div>
+        <div className="mt-8">
+          <div className="h-4 w-full overflow-hidden rounded-full bg-gray-200">
+            <div
+              className="h-full rounded-full bg-blue-600 transition-all duration-300"
+              style={{
+                width: `${percent}%`,
+              }}
+            />
+          </div>
+
+          <div className="mt-3 flex justify-between text-sm font-medium">
+            <span>
+              {completed} / {total}
+            </span>
+
+            <span>{percent}%</span>
+          </div>
         </div>
 
         <p className="mt-8 text-center text-sm text-gray-500">

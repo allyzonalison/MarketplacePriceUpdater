@@ -13,28 +13,19 @@ const io = new Server(httpServer, {
     origin: [
       "http://localhost:5173",
       "https://marketplace-price-updater-delta.vercel.app",
+      "https://668pricing.vercel.app",
     ],
     methods: ["GET", "POST", "PATCH", "DELETE"],
   },
 });
 
-// Make Socket.IO available everywhere
+/*
+ * Make Socket.IO available to services.
+ */
 setSocketServer(io);
 
 io.on("connection", (socket) => {
   console.log(`🟢 Client connected: ${socket.id}`);
-
-  socket.emit("test-event", {
-    message: "Hello from backend",
-  });
-
-  socket.emit("price-update-progress", {
-    completed: 1,
-    total: 10,
-    percent: 10,
-  });
-
-  socket.emit("price-update-complete");
 
   socket.on("disconnect", () => {
     console.log(`🔴 Client disconnected: ${socket.id}`);

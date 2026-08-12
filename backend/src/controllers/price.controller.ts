@@ -1,4 +1,5 @@
 import { Request, Response } from "express";
+
 import {
   previewGroupPrice,
   applyGroupPrice,
@@ -7,25 +8,27 @@ import {
 
 export const applyPricesController = async (req: Request, res: Response) => {
   try {
+    console.log("===== APPLY PRICE REQUEST =====");
     console.log(req.body);
 
     const { group, supplier, pricePerGram } = req.body;
 
-    await applyGroupPrice({
+    const result = await applyGroupPrice({
       group,
       supplier,
       pricePerGram,
     });
 
-    res.json({
-      message: "Prices updated successfully.",
+    res.status(202).json({
+      message: "Price update started.",
+      total: result.total,
     });
   } catch (error) {
     console.error("===== APPLY PRICE ERROR =====");
     console.error(error);
 
     res.status(500).json({
-      message: "Failed to update prices.",
+      message: "Failed to start price update.",
     });
   }
 };

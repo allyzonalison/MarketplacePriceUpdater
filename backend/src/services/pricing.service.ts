@@ -68,9 +68,17 @@ export const applyGroupPrice = async ({
 }: ApplyGroupPriceInput) => {
   const io = getSocketServer();
 
-  const products = await prisma.product.findMany();
+  console.log("================================");
+  console.log("STARTING PRICE UPDATE");
+  console.log("Group:", group);
+  console.log("Supplier:", supplier);
+  console.log("New price per gram:", pricePerGram);
+  console.log("================================");
 
-  console.log("Selected supplier:", supplier);
+  /*
+   * Get products that belong to this price group.
+   */
+  const products = await prisma.product.findMany();
 
   const productsToUpdate = products.filter((product) => {
     if (product.isManualPrice) {
@@ -81,36 +89,40 @@ export const applyGroupPrice = async ({
       return false;
     }
 
-    console.log(
-      product.productName,
-      "| Database supplier:",
-      product.supplier,
-      "| Selected supplier:",
-      supplier
-    );
-
     if (supplier !== "ALL" && product.supplier !== supplier) {
       return false;
     }
 
-    return true;
+    return Boolean(product.gramRange);
   });
-
-  console.log("================================");
-  console.log("Products that will be updated:");
-
-  productsToUpdate.forEach((p) => {
-    console.log(
-      `${p.productName} | Supplier: ${p.supplier} | Price: ${p.price}`
-    );
-  });
-
-  console.log("Total:", productsToUpdate.length);
-  console.log("================================");
 
   const total = productsToUpdate.length;
 
-  let completed = 0;
+  console.log("Products to update:", total);
+
+  /*
+   * Tell frontend the total immediately.
+   */
+  io.emit("price-update-progress", {
+    completed: 0,
+    total,
+    percent: 0,
+  });
+
+  /*
+   * Group products by their resulting selling price.
+   *
+   * Example:
+   *
+   * 0.25 - 0.30 -> ₱187
+   * 0.30 - 0.35 -> ₱218
+   * 0.35 - 0.40 -> ₱250
+   *
+   * Instead of doing thousands of UPDATE queries,
+   * we can do one UPDATE per price group.
+   */
+  const updateGroups = new Map<number, number[]>();
+
   for (const product of productsToUpdate) {
     if (!product.gramRange) {
       continue;
@@ -118,32 +130,72 @@ export const applyGroupPrice = async ({
 
     const newPrice = calculateSellingPrice(product.gramRange, pricePerGram);
 
-    await prisma.product.update({
+    const existing = updateGroups.get(newPrice) ?? [];
+
+    existing.push(product.id);
+
+    updateGroups.set(newPrice, existing);
+  }
+
+  console.log("Number of database update groups:", updateGroups.size);
+
+  /*
+   * Update each price group.
+   *
+   * This is dramatically faster than updating
+   * every product individually.
+   */
+  let completed = 0;
+
+  for (const [newPrice, productIds] of updateGroups) {
+    await prisma.product.updateMany({
       where: {
-        id: product.id,
+        id: {
+          in: productIds,
+        },
       },
+
       data: {
         price: new Prisma.Decimal(newPrice),
+
         pricePerGram: new Prisma.Decimal(pricePerGram),
       },
     });
 
-    completed++;
+    completed += productIds.length;
+
+    const percent = total === 0 ? 100 : Math.round((completed / total) * 100);
 
     const progress = {
       completed,
       total,
-      percent: Math.round((completed / total) * 100),
+      percent,
     };
 
-    console.log("📤 Sending progress:", progress);
+    console.log(`📤 Progress: ${completed}/${total} (${percent}%)`);
 
     io.emit("price-update-progress", progress);
   }
 
+  /*
+   * Make sure frontend receives 100%.
+   */
+  io.emit("price-update-progress", {
+    completed: total,
+    total,
+    percent: 100,
+  });
+
   io.emit("price-update-complete");
 
-  console.log(`🎉 ${group} (${supplier}) price update completed.`);
+  console.log("================================");
+  console.log("PRICE UPDATE COMPLETE");
+  console.log(`Updated ${total} products.`);
+  console.log("================================");
+
+  return {
+    total,
+  };
 };
 
 export const getCurrentPrices = async () => {
