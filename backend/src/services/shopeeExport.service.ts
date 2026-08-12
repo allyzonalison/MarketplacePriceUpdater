@@ -4,10 +4,20 @@ import { getSocketServer } from "../lib/socket.js";
 
 const normalize = (value: string | null | undefined) =>
   (value ?? "")
-    .replace(/\u00A0/g, " ")
+    // Normalize Unicode characters
+    .normalize("NFKC")
+
+    // Remove invisible Unicode characters
+    .replace(/[\u200B-\u200D\uFEFF]/g, "")
+
+    // Convert all whitespace variations to normal spaces
+    .replace(/\s+/g, " ")
+
+    // Remove spaces at the beginning/end
     .trim()
-    .toLowerCase()
-    .replace(/\s+/g, " ");
+
+    // Make matching case-insensitive
+    .toLowerCase();
 
 const makeProductKey = (
   productName: string | null | undefined,
@@ -90,7 +100,13 @@ export const exportShopee = async (buffer: Buffer) => {
     const product = productMap.get(key);
 
     if (!product) {
-      console.warn(`No match: "${productName}" / "${variationName}"`);
+      console.warn("====================================");
+      console.warn("❌ SHOPEE PRODUCT NOT MATCHED");
+      console.warn("Excel Product:", JSON.stringify(productName));
+      console.warn("Excel Variation:", JSON.stringify(variationName));
+      console.warn("Normalized Product:", normalize(productName));
+      console.warn("Normalized Variation:", normalize(variationName));
+      console.warn("====================================");
 
       completed++;
 
