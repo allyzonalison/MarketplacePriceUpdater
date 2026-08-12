@@ -37,7 +37,7 @@ export const exportShopeeController = async (req: Request, res: Response) => {
       type: "nodebuffer",
       compression: "DEFLATE",
       compressionOptions: {
-        level: 9,
+        level: 3,
       },
     });
 
