@@ -19,7 +19,8 @@ export interface CreateProductPayload {
 
 export const getProducts = async (): Promise<Product[]> => {
   const response = await api.get("/products");
-  return response.data;
+
+  return response.data.products;
 };
 
 export const updateProduct = async (
