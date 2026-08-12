@@ -3,7 +3,19 @@ export interface VariantRow {
 
   id: number | null;
 
+  // =====================================================
+  // USER INPUT
+  // =====================================================
+
+  // This is the variation name entered by the user.
+  //
+  // For NEW products:
+  // - Shopee  -> blank
+  // - Lazada  -> this value
+  // - TikTok  -> this value, or "Default" if blank
+  //
   variationName: string;
+
   supplier: string;
 
   grams: string;
@@ -12,18 +24,28 @@ export interface VariantRow {
 
   stock: number;
 
-  // Shopee
+  // =====================================================
+  // SHOPEE
+  // =====================================================
+
+  variationNameShopee: string | null;
   productIdShopee: string | null;
   variationIdShopee: string | null;
 
-  // Lazada
+  // =====================================================
+  // LAZADA
+  // =====================================================
+
   variationNameLazada: string | null;
   productIdLazada: string | null;
   skuIdLazada: string | null;
   keyLazada: string | null;
   quantityLazada: number | null;
 
-  // TikTok
+  // =====================================================
+  // TIKTOK
+  // =====================================================
+
   variationNameTiktok: string | null;
   productIdTiktok: string | null;
   skuIdTiktok: string | null;

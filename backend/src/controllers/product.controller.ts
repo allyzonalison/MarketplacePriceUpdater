@@ -9,11 +9,21 @@ import {
   updateProduct,
 } from "../services/product.service.js";
 
-export const getProducts = async (_req: Request, res: Response) => {
+export const getProducts = async (req: Request, res: Response) => {
   try {
-    const products = await getAllProducts();
+    const page = Number(req.query.page ?? 1);
 
-    res.json(products);
+    const limit = Number(req.query.limit ?? 50);
+
+    const search = typeof req.query.search === "string" ? req.query.search : "";
+
+    const result = await getAllProducts({
+      page,
+      limit,
+      search,
+    });
+
+    res.json(result);
   } catch (error) {
     console.error(error);
 
@@ -53,6 +63,7 @@ export const createNewProduct = async (req: Request, res: Response) => {
     res.status(201).json(product);
   } catch (error) {
     console.error("CREATE PRODUCT ERROR:");
+
     console.error(error);
 
     res.status(500).json({

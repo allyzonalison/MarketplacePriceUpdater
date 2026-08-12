@@ -3,11 +3,11 @@ import { useEffect, useState } from "react";
 import ProductInformation from "./ProductInformation";
 import VariantToolbar from "./VariantToolbar";
 import VariantsGrid from "./VariantsGrid";
-/*import { calculateSellingPrice } from "./PriceCalculator";*/
 import { validateProduct } from "./validateProduct";
 
 import type { Product } from "../../../types/product";
 import type { VariantRow } from "../../../types/variant";
+
 import {
   createProduct,
   updateProduct,
@@ -28,7 +28,9 @@ const createVariant = (): VariantRow => ({
 
   id: null,
 
+  // User input for Lazada + TikTok
   variationName: "",
+
   supplier: "",
 
   grams: "",
@@ -38,22 +40,23 @@ const createVariant = (): VariantRow => ({
   stock: 0,
 
   // Shopee
+  variationNameShopee: null,
   productIdShopee: null,
   variationIdShopee: null,
 
   // Lazada
+  variationNameLazada: null,
   productIdLazada: null,
   skuIdLazada: null,
   keyLazada: null,
   quantityLazada: null,
-  variationNameLazada: null,
 
   // TikTok
+  variationNameTiktok: null,
   productIdTiktok: null,
   skuIdTiktok: null,
   categoryTiktok: null,
   quantityTiktok: null,
-  variationNameTiktok: null,
 });
 
 const ProductModal = ({
@@ -74,17 +77,9 @@ const ProductModal = ({
   const [deletedVariantIds, setDeletedVariantIds] = useState<number[]>([]);
 
   useEffect(() => {
-    console.log("======== ProductModal ========");
-    console.log("isOpen:", isOpen);
-    console.log("isEditMode:", isEditMode);
-    console.log("productGroup length:", productGroup.length);
-    console.log(productGroup);
-
     if (!isOpen) return;
 
     if (isEditMode && productGroup.length > 0) {
-      console.log("Loading variants...");
-
       setProductName(productGroup[0].productName);
       setCategory(productGroup[0].masterCategory);
 
@@ -94,16 +89,26 @@ const ProductModal = ({
 
           id: product.id,
 
-          variationName: product.variationNameShopee ?? "",
+          /*
+           * The editable "Variation" field is now based on Lazada.
+           *
+           * If Lazada has no variation name, fall back to TikTok.
+           * This is useful for existing records.
+           */
+          variationName:
+            product.variationNameLazada ?? product.variationNameTiktok ?? "",
+
           supplier: product.supplier,
 
           grams: product.gramRange ?? "",
-          pricePerGram: Number(product.pricePerGram),
+          pricePerGram:
+            product.pricePerGram === null ? null : Number(product.pricePerGram),
           sellingPrice: Number(product.price),
 
           stock: product.stock,
 
           // Shopee
+          variationNameShopee: product.variationNameShopee,
           productIdShopee: product.productIdShopee,
           variationIdShopee: product.variationIdShopee,
 
@@ -131,6 +136,7 @@ const ProductModal = ({
       setRows([createVariant()]);
 
       setSelectedVariantClientId(null);
+      setDeletedVariantIds([]);
     }
   }, [isOpen, isEditMode, productGroup]);
 
@@ -151,8 +157,6 @@ const ProductModal = ({
 
     if (!rowToDelete) return;
 
-    // If this row already exists in the database,
-    // remember its ID so we can delete it when Update is clicked.
     if (rowToDelete.id !== null) {
       setDeletedVariantIds((previous) => [...previous, rowToDelete.id!]);
     }
@@ -179,7 +183,7 @@ const ProductModal = ({
         return {
           ...row,
 
-          // Shopee only
+          variationNameShopee: null,
           productIdShopee: null,
           variationIdShopee: null,
         };
@@ -250,6 +254,7 @@ const ProductModal = ({
       previous.map((row) => ({
         ...row,
 
+        variationNameShopee: null,
         productIdShopee: null,
         variationIdShopee: null,
       }))
@@ -308,6 +313,17 @@ const ProductModal = ({
       return;
     }
 
+    /*
+     * For NEW products:
+     *
+     * User input:
+     *   variationName
+     *
+     * becomes:
+     *   Shopee  -> null
+     *   Lazada  -> user input or null
+     *   TikTok  -> user input or "Default"
+     */
     const payload = {
       productName,
       category,
@@ -321,10 +337,8 @@ const ProductModal = ({
 
     try {
       if (isEditMode) {
-        rows.forEach((row) => {
-          console.log(row);
-        });
         await Promise.all(deletedVariantIds.map((id) => deleteProduct(id)));
+
         await Promise.all(
           rows.map((row) => {
             const payload = {
@@ -332,51 +346,66 @@ const ProductModal = ({
               masterCategory: category,
 
               supplier: row.supplier,
+
               gramRange: row.grams.trim() === "" ? undefined : row.grams,
 
               pricePerGram: row.pricePerGram ?? undefined,
+
               price: row.sellingPrice ?? 0,
 
               stock: row.stock,
 
               // Shopee
-              variationNameShopee:
-                row.variationName.trim() === "" ? null : row.variationName,
+              variationNameShopee: row.variationNameShopee,
 
               productIdShopee: row.productIdShopee,
+
               variationIdShopee: row.variationIdShopee,
 
               // Lazada
-              variationNameLazada: row.variationNameLazada,
+              variationNameLazada:
+                row.variationName.trim() === "" ? null : row.variationName,
+
               productIdLazada: row.productIdLazada,
+
               skuIdLazada: row.skuIdLazada,
+
               keyLazada: row.keyLazada,
+
               quantityLazada: row.quantityLazada,
 
               // TikTok
-              variationNameTiktok: row.variationNameTiktok,
+              variationNameTiktok:
+                row.variationName.trim() === "" ? "Default" : row.variationName,
+
               productIdTiktok: row.productIdTiktok,
+
               skuIdTiktok: row.skuIdTiktok,
+
               categoryTiktok: row.categoryTiktok,
+
               quantityTiktok: row.quantityTiktok,
             };
 
             if (row.id !== null) {
               return updateProduct(row.id, payload);
-              console.log(payload);
             }
 
             return createProduct({
               productName,
               category,
+
               rows: [
                 {
                   variationName: row.variationName,
+
                   supplier: row.supplier,
 
                   grams: row.grams,
+
                   pricePerGram:
                     row.pricePerGram == null ? null : Number(row.pricePerGram),
+
                   sellingPrice: row.sellingPrice ?? 0,
 
                   stock: row.stock,
@@ -387,6 +416,7 @@ const ProductModal = ({
         );
 
         setDeletedVariantIds([]);
+
         alert("Product updated successfully!");
       } else {
         await createProduct(payload);
@@ -398,6 +428,7 @@ const ProductModal = ({
       onClose();
     } catch (error) {
       console.error(error);
+
       alert(
         isEditMode ? "Unable to update product." : "Unable to save product."
       );

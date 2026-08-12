@@ -1,6 +1,7 @@
 import { AgGridReact } from "ag-grid-react";
 import { SUPPLIERS } from "../../../constants/suppliers";
 import { calculateSellingPrice } from "./PriceCalculator";
+
 import {
   AllCommunityModule,
   ModuleRegistry,
@@ -47,6 +48,159 @@ const VariantsGrid = ({
     );
   };
 
+  const variationColumn: ColDef<VariantRow> = {
+    headerName: "Variation Name",
+    field: "variationName",
+    width: 180,
+    editable: true,
+  };
+
+  const commonEditableColumns: ColDef<VariantRow>[] = [
+    {
+      headerName: "Supplier",
+      field: "supplier",
+      width: 120,
+      editable: true,
+      cellEditor: "agSelectCellEditor",
+      cellEditorParams: {
+        values: SUPPLIERS,
+      },
+    },
+    {
+      headerName: "Grams",
+      field: "grams",
+      width: 120,
+      editable: true,
+      cellStyle: (params) =>
+        isValidWeightRange(params.value)
+          ? null
+          : { backgroundColor: "#FEE2E2" },
+    },
+    {
+      headerName: "Price / Gram",
+      field: "pricePerGram",
+      width: 130,
+      editable: true,
+
+      valueParser: (params) => {
+        if (params.newValue === "") return null;
+        return Number(params.newValue);
+      },
+
+      cellStyle: (params) =>
+        isPositiveNumber(params.value) ? null : { backgroundColor: "#FEE2E2" },
+    },
+    {
+      headerName: "Selling Price",
+      field: "sellingPrice",
+      width: 130,
+      editable: (params) => canEditSellingPrice(params.data),
+
+      valueParser: (params) => {
+        if (params.newValue === "") return null;
+        return Number(params.newValue);
+      },
+    },
+    {
+      headerName: "Stock",
+      field: "stock",
+      width: 100,
+      editable: true,
+
+      cellStyle: (params) =>
+        isWholeNumber(params.value) ? null : { backgroundColor: "#FEE2E2" },
+    },
+  ];
+
+  const marketplaceColumns: ColDef<VariantRow>[] = [
+    // -------------------------
+    // SHOPEE
+    // -------------------------
+    {
+      headerName: "Shopee Product ID",
+      field: "productIdShopee",
+      width: 180,
+    },
+    {
+      headerName: "Shopee Variation ID",
+      field: "variationIdShopee",
+      width: 180,
+    },
+    {
+      headerName: "Shopee Variation Name",
+      field: "variationNameShopee",
+      width: 180,
+    },
+
+    // -------------------------
+    // LAZADA
+    // -------------------------
+    {
+      headerName: "Lazada Product ID",
+      field: "productIdLazada",
+      width: 180,
+    },
+    {
+      headerName: "Lazada SKU ID",
+      field: "skuIdLazada",
+      width: 180,
+    },
+    {
+      headerName: "Lazada Key",
+      field: "keyLazada",
+      width: 180,
+    },
+    {
+      headerName: "Lazada Qty",
+      field: "quantityLazada",
+      width: 120,
+
+      valueParser: (params) => {
+        if (params.newValue === "") return null;
+        return Number(params.newValue);
+      },
+    },
+    {
+      headerName: "Lazada Variation Name",
+      field: "variationNameLazada",
+      width: 180,
+    },
+
+    // -------------------------
+    // TIKTOK
+    // -------------------------
+    {
+      headerName: "TikTok Product ID",
+      field: "productIdTiktok",
+      width: 180,
+    },
+    {
+      headerName: "TikTok SKU ID",
+      field: "skuIdTiktok",
+      width: 180,
+    },
+    {
+      headerName: "TikTok Category",
+      field: "categoryTiktok",
+      width: 180,
+    },
+    {
+      headerName: "TikTok Qty",
+      field: "quantityTiktok",
+      width: 120,
+
+      valueParser: (params) => {
+        if (params.newValue === "") return null;
+        return Number(params.newValue);
+      },
+    },
+    {
+      headerName: "TikTok Variation Name",
+      field: "variationNameTiktok",
+      width: 180,
+    },
+  ];
+
   const columnDefs: ColDef<VariantRow>[] = isEditMode
     ? [
         {
@@ -57,136 +211,11 @@ const VariantsGrid = ({
           pinned: "left",
         },
 
-        {
-          headerName: "Variation",
-          field: "variationName",
-          width: 150,
-        },
-        {
-          headerName: "Supplier",
-          field: "supplier",
-          width: 120,
-          editable: true,
-          cellEditor: "agSelectCellEditor",
-          cellEditorParams: {
-            values: SUPPLIERS,
-          },
-        },
-        {
-          headerName: "Grams",
-          field: "grams",
-          width: 120,
-          editable: true,
-          cellStyle: (params) =>
-            isValidWeightRange(params.value)
-              ? null
-              : { backgroundColor: "#FEE2E2" },
-        },
-        {
-          headerName: "Price / Gram",
-          field: "pricePerGram",
-          width: 130,
-          editable: true,
+        variationColumn,
 
-          valueParser: (params) => {
-            if (params.newValue === "") return null;
-            return Number(params.newValue);
-          },
+        ...commonEditableColumns,
 
-          cellStyle: (params) =>
-            isPositiveNumber(params.value)
-              ? null
-              : { backgroundColor: "#FEE2E2" },
-        },
-        {
-          headerName: "Selling Price",
-          field: "sellingPrice",
-          width: 130,
-          editable: (params) => canEditSellingPrice(params.data),
-          valueParser: (params) => {
-            if (params.newValue === "") return null;
-            return Number(params.newValue);
-          },
-        },
-        {
-          headerName: "Stock",
-          field: "stock",
-          width: 100,
-          editable: true,
-          cellStyle: (params) =>
-            isWholeNumber(params.value) ? null : { backgroundColor: "#FEE2E2" },
-        },
-
-        {
-          headerName: "Shopee Product ID",
-          field: "productIdShopee",
-          width: 180,
-        },
-        {
-          headerName: "Shopee Variation ID",
-          field: "variationIdShopee",
-          width: 180,
-        },
-
-        {
-          headerName: "Lazada Product ID",
-          field: "productIdLazada",
-          width: 180,
-        },
-        {
-          headerName: "Lazada SKU ID",
-          field: "skuIdLazada",
-          width: 180,
-        },
-        {
-          headerName: "Lazada Key",
-          field: "keyLazada",
-          width: 180,
-        },
-        {
-          headerName: "Lazada Qty",
-          field: "quantityLazada",
-          width: 120,
-          valueParser: (params) => {
-            if (params.newValue === "") return null;
-            return Number(params.newValue);
-          },
-        },
-        {
-          headerName: "Lazada Variation",
-          field: "variationNameLazada",
-          width: 180,
-        },
-
-        {
-          headerName: "TikTok Product ID",
-          field: "productIdTiktok",
-          width: 180,
-        },
-        {
-          headerName: "TikTok SKU ID",
-          field: "skuIdTiktok",
-          width: 180,
-        },
-        {
-          headerName: "TikTok Category",
-          field: "categoryTiktok",
-          width: 180,
-        },
-        {
-          headerName: "TikTok Qty",
-          field: "quantityTiktok",
-          width: 120,
-          valueParser: (params) => {
-            if (params.newValue === "") return null;
-            return Number(params.newValue);
-          },
-        },
-        {
-          headerName: "TikTok Variation",
-          field: "variationNameTiktok",
-          width: 180,
-        },
+        ...marketplaceColumns,
       ]
     : [
         {
@@ -196,63 +225,31 @@ const VariantsGrid = ({
           editable: false,
           pinned: "left",
         },
+
         {
-          headerName: "Variation",
-          field: "variationName",
+          ...variationColumn,
           flex: 1.5,
         },
-        {
-          headerName: "Supplier",
-          field: "supplier",
-          flex: 1,
-          editable: true,
-          cellEditor: "agSelectCellEditor",
-          cellEditorParams: {
-            values: SUPPLIERS,
-          },
-        },
-        {
-          headerName: "Grams",
-          field: "grams",
-          flex: 1,
-          editable: true,
-          cellStyle: (params) =>
-            isValidWeightRange(params.value)
-              ? null
-              : { backgroundColor: "#FEE2E2" },
-        },
-        {
-          headerName: "Price / Gram",
-          field: "pricePerGram",
-          flex: 1,
-          editable: true,
-          valueParser: (params) => {
-            if (params.newValue === "") return null;
-            return Number(params.newValue);
-          },
 
-          cellStyle: (params) =>
-            isPositiveNumber(params.value)
-              ? null
-              : { backgroundColor: "#FEE2E2" },
-        },
         {
-          headerName: "Selling Price",
-          field: "sellingPrice",
+          ...commonEditableColumns[0],
           flex: 1,
-          editable: (params) => canEditSellingPrice(params.data),
-          valueParser: (params) => {
-            if (params.newValue === "") return null;
-            return Number(params.newValue);
-          },
         },
         {
-          headerName: "Stock",
-          field: "stock",
+          ...commonEditableColumns[1],
+          flex: 1,
+        },
+        {
+          ...commonEditableColumns[2],
+          flex: 1,
+        },
+        {
+          ...commonEditableColumns[3],
+          flex: 1,
+        },
+        {
+          ...commonEditableColumns[4],
           flex: 0.8,
-          editable: true,
-          cellStyle: (params) =>
-            isWholeNumber(params.value) ? null : { backgroundColor: "#FEE2E2" },
         },
       ];
 
@@ -260,7 +257,6 @@ const VariantsGrid = ({
     const updatedRow: VariantRow = {
       ...event.data,
 
-      // Convert empty input to null
       pricePerGram: event.data.pricePerGram,
     };
 

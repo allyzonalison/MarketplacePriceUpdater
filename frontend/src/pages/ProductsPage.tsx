@@ -48,7 +48,6 @@ const ProductsPage = () => {
 
   useEffect(() => {
     void refreshProducts();
-    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
   const handlePreview = (previewProducts: Product[]) => {

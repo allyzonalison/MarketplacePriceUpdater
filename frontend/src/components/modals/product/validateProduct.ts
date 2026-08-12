@@ -27,14 +27,20 @@ export function validateProduct(
   rows.forEach((row, index) => {
     const rowNo = index + 1;
 
+    // Supplier is required
     if (!row.supplier.trim()) {
       errors.push(`Row ${rowNo}: Supplier is required.`);
     }
 
-    // Variation Name is required
-    if (!row.variationName.trim()) {
-      errors.push(`Row ${rowNo}: Variation Name is required.`);
-    }
+    /*
+     * Variation Name is OPTIONAL.
+     *
+     * Some products do not have a variation name,
+     * especially single-variation TikTok products.
+     *
+     * TikTok will use "Default" when the variation
+     * name is blank.
+     */
 
     // Selling Price is required
     if (!isPositiveNumber(row.sellingPrice)) {
@@ -55,15 +61,6 @@ export function validateProduct(
     ) {
       errors.push(`Row ${rowNo}: Invalid price per gram.`);
     }
-
-    /*
-    if (
-      String(row.pricePerGram).trim() !== "" &&
-      !isPositiveNumber(row.pricePerGram)
-    ) {
-      errors.push(`Row ${rowNo}: Invalid price per gram.`);
-    }
-      */
 
     if (!isWholeNumber(row.stock)) {
       errors.push(`Row ${rowNo}: Invalid stock.`);
