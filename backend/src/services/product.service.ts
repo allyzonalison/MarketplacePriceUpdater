@@ -285,9 +285,13 @@ export const getProductGroup = async (productName: string) => {
 };
 
 export const createProduct = async (dto: CreateProductDTO) => {
+  const hasMultipleVariants = dto.rows.length > 1;
+
   return await prisma.$transaction(
-    dto.rows.map((row) =>
-      prisma.product.create({
+    dto.rows.map((row) => {
+      const variationName = row.variationName?.trim() || null;
+
+      return prisma.product.create({
         data: {
           productName: dto.productName,
 
@@ -309,23 +313,37 @@ export const createProduct = async (dto: CreateProductDTO) => {
 
           stock: row.stock,
 
-          variationNameShopee: null,
+          // --------------------------------
+          // Shopee
+          // --------------------------------
+          // Multiple variants:
+          //   use the entered variation name.
+          //
+          // Single variant:
+          //   ALWAYS null.
+          variationNameShopee: hasMultipleVariants ? variationName : null,
 
           productIdShopee: null,
           variationIdShopee: null,
 
-          variationNameLazada:
-            row.variationName?.trim() === "" ? null : row.variationName ?? null,
+          // --------------------------------
+          // Lazada
+          // --------------------------------
+          // Always use the entered variation.
+          // Empty input becomes null.
+          variationNameLazada: variationName,
 
           productIdLazada: null,
           skuIdLazada: null,
           keyLazada: null,
           quantityLazada: null,
 
-          variationNameTiktok:
-            row.variationName?.trim() === ""
-              ? "Default"
-              : row.variationName ?? "Default",
+          // --------------------------------
+          // TikTok
+          // --------------------------------
+          // Use entered variation.
+          // If there is no variation, use Default.
+          variationNameTiktok: variationName ?? "Default",
 
           productIdTiktok: null,
           skuIdTiktok: null,
@@ -334,8 +352,8 @@ export const createProduct = async (dto: CreateProductDTO) => {
 
           isManualPrice: false,
         },
-      })
-    )
+      });
+    })
   );
 };
 
