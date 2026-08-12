@@ -7,7 +7,7 @@ import {
   ModuleRegistry,
   type CellValueChangedEvent,
   type ColDef,
-  type RowSelectedEvent,
+  type SelectionChangedEvent,
 } from "ag-grid-community";
 
 import {
@@ -279,13 +279,12 @@ const VariantsGrid = ({
     onRowsChange(updatedRows);
   };
 
-  const handleRowSelected = (event: RowSelectedEvent<VariantRow>) => {
-    if (!event.node.isSelected()) {
-      onSelectedRowChange(null);
-      return;
-    }
+  const handleSelectionChanged = (event: SelectionChangedEvent<VariantRow>) => {
+    const selectedRows = event.api.getSelectedRows();
 
-    onSelectedRowChange(event.data?.clientId ?? null);
+    const selectedRow = selectedRows[0];
+
+    onSelectedRowChange(selectedRow?.clientId ?? null);
   };
 
   return (
@@ -301,16 +300,9 @@ const VariantsGrid = ({
         rowData={rows}
         columnDefs={columnDefs}
         rowSelection="single"
-        onRowSelected={handleRowSelected}
+        onSelectionChanged={handleSelectionChanged}
         onCellValueChanged={handleCellValueChanged}
         getRowId={(params) => params.data.clientId}
-        defaultColDef={{
-          editable: true,
-          resizable: true,
-          sortable: true,
-          filter: true,
-          minWidth: 120,
-        }}
       />
     </div>
   );
