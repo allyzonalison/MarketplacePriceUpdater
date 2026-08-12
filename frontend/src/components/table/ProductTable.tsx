@@ -1,6 +1,6 @@
-import { matchesFilter } from "../../utils/productFilters";
 import { useMemo } from "react";
 import { AgGridReact } from "ag-grid-react";
+
 import {
   AllCommunityModule,
   ModuleRegistry,
@@ -79,13 +79,12 @@ interface ProductTableProps {
 
 const ProductTable = ({
   products,
-  selectedFilter,
   loading,
   onSelectedProductChange,
 }: ProductTableProps) => {
-  const filteredProducts = useMemo(() => {
-    return products.filter((product) => matchesFilter(product, selectedFilter));
-  }, [products, selectedFilter]);
+  const rowData = useMemo(() => {
+    return products;
+  }, [products]);
 
   const handleCellValueChanged = async (
     event: CellValueChangedEvent<Product>
@@ -113,6 +112,7 @@ const ProductTable = ({
           updatedData.price = newSellingPrice;
 
           event.data.price = newSellingPrice;
+
           event.node.setDataValue("price", newSellingPrice);
         }
       }
@@ -126,13 +126,14 @@ const ProductTable = ({
       if (pricePerGram != null && event.data.gramRange) {
         const newSellingPrice = calculateSellingPrice(
           event.data.gramRange,
-          pricePerGram
+          Number(pricePerGram)
         );
 
         if (newSellingPrice !== null) {
           updatedData.price = newSellingPrice;
 
           event.data.price = newSellingPrice;
+
           event.node.setDataValue("price", newSellingPrice);
         }
       }
@@ -149,6 +150,7 @@ const ProductTable = ({
 
   const handleSelectionChanged = (event: SelectionChangedEvent<Product>) => {
     const selected = event.api.getSelectedRows()[0] ?? null;
+
     onSelectedProductChange(selected);
   };
 
@@ -156,7 +158,7 @@ const ProductTable = ({
     <div className="h-full w-full">
       <div className="ag-theme-alpine h-full w-full overflow-hidden rounded-lg">
         <AgGridReact<Product>
-          rowData={filteredProducts}
+          rowData={rowData}
           columnDefs={columnDefs}
           loading={loading}
           onCellValueChanged={handleCellValueChanged}

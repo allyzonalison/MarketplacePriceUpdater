@@ -13,18 +13,23 @@ export const getProducts = async (req: Request, res: Response) => {
   try {
     const page = Number(req.query.page ?? 1);
 
-    const limit = Number(req.query.limit ?? 50);
+    const limit = Number(req.query.limit ?? 5000);
 
     const search = typeof req.query.search === "string" ? req.query.search : "";
+
+    const filter =
+      typeof req.query.filter === "string" ? req.query.filter : "all";
 
     const result = await getAllProducts({
       page,
       limit,
       search,
+      filter,
     });
 
     res.json(result);
   } catch (error) {
+    console.error("GET PRODUCTS ERROR:");
     console.error(error);
 
     res.status(500).json({
@@ -63,7 +68,6 @@ export const createNewProduct = async (req: Request, res: Response) => {
     res.status(201).json(product);
   } catch (error) {
     console.error("CREATE PRODUCT ERROR:");
-
     console.error(error);
 
     res.status(500).json({

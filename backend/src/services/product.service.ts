@@ -6,125 +6,237 @@ export interface GetProductsOptions {
   page?: number;
   limit?: number;
   search?: string;
+  filter?: string;
 }
 
 export const getAllProducts = async ({
   page = 1,
-  limit = 50,
+  limit = 5000,
   search = "",
+  filter = "all",
 }: GetProductsOptions = {}) => {
-  /*
-   * Safety limits.
-   *
-   * We don't want the frontend accidentally requesting
-   * thousands of products at once.
-   */
-
   const safePage = Number.isFinite(page) && page > 0 ? Math.floor(page) : 1;
 
   const safeLimit =
-    Number.isFinite(limit) && limit > 0 ? Math.min(Math.floor(limit), 100) : 50;
+    Number.isFinite(limit) && limit > 0
+      ? Math.min(Math.floor(limit), 5000)
+      : 5000;
 
   const skip = (safePage - 1) * safeLimit;
 
-  /*
-   * Build the search filter.
-   *
-   * Search is performed by PostgreSQL rather than
-   * downloading all products to React.
-   */
-
   const trimmedSearch = search.trim();
 
+  const conditions: Prisma.ProductWhereInput[] = [];
+
+  // --------------------------------------------------
+  // SEARCH
+  // --------------------------------------------------
+
+  if (trimmedSearch.length > 0) {
+    conditions.push({
+      OR: [
+        {
+          productName: {
+            contains: trimmedSearch,
+            mode: "insensitive",
+          },
+        },
+        {
+          supplier: {
+            contains: trimmedSearch,
+            mode: "insensitive",
+          },
+        },
+        {
+          productIdShopee: {
+            contains: trimmedSearch,
+            mode: "insensitive",
+          },
+        },
+        {
+          variationIdShopee: {
+            contains: trimmedSearch,
+            mode: "insensitive",
+          },
+        },
+        {
+          productIdLazada: {
+            contains: trimmedSearch,
+            mode: "insensitive",
+          },
+        },
+        {
+          skuIdLazada: {
+            contains: trimmedSearch,
+            mode: "insensitive",
+          },
+        },
+        {
+          productIdTiktok: {
+            contains: trimmedSearch,
+            mode: "insensitive",
+          },
+        },
+        {
+          skuIdTiktok: {
+            contains: trimmedSearch,
+            mode: "insensitive",
+          },
+        },
+        {
+          masterCategory: {
+            contains: trimmedSearch,
+            mode: "insensitive",
+          },
+        },
+        {
+          variationNameShopee: {
+            contains: trimmedSearch,
+            mode: "insensitive",
+          },
+        },
+        {
+          variationNameLazada: {
+            contains: trimmedSearch,
+            mode: "insensitive",
+          },
+        },
+        {
+          variationNameTiktok: {
+            contains: trimmedSearch,
+            mode: "insensitive",
+          },
+        },
+        {
+          gramRange: {
+            contains: trimmedSearch,
+            mode: "insensitive",
+          },
+        },
+      ],
+    });
+  }
+
+  // --------------------------------------------------
+  // DROPDOWN FILTER
+  // --------------------------------------------------
+
+  switch (filter) {
+    // Categories
+    case "Earrings":
+    case "Pendant":
+    case "Bracelet_Anklet":
+    case "Necklace":
+    case "Ring":
+      conditions.push({
+        masterCategory: filter,
+      });
+      break;
+
+    // Suppliers
+    case "668":
+    case "FG":
+    case "SK":
+    case "GS":
+      conditions.push({
+        supplier: filter,
+      });
+      break;
+
+    // Electroform
+    case "Electroform":
+      conditions.push({
+        productName: {
+          contains: "electroform",
+          mode: "insensitive",
+        },
+      });
+      break;
+
+    // Couple Rings
+    case "Couple Rings":
+      conditions.push({
+        productName: {
+          contains: "couple",
+          mode: "insensitive",
+        },
+      });
+      break;
+
+    // 24K Gold Rings
+    case "24K Gold Rings":
+      conditions.push({
+        OR: [
+          {
+            productName: "Pawnable 24K Gold Solid Slim Plain Ring",
+          },
+          {
+            productName: "Pawnable 24K Gold Slim Plain Ring",
+          },
+        ],
+      });
+      break;
+
+    // Manual Pricing
+    case "Manual Pricing":
+      conditions.push({
+        OR: [
+          {
+            productName: {
+              contains: "pearl",
+              mode: "insensitive",
+            },
+          },
+          {
+            productName: {
+              contains: "piyao",
+              mode: "insensitive",
+            },
+          },
+          {
+            productName: {
+              contains: "coral",
+              mode: "insensitive",
+            },
+          },
+          {
+            productName: {
+              contains: "customize",
+              mode: "insensitive",
+            },
+          },
+          {
+            productName: {
+              contains: "24k gold bar",
+              mode: "insensitive",
+            },
+          },
+          {
+            productName: {
+              contains: "24k mini chinese gold bar",
+              mode: "insensitive",
+            },
+          },
+          {
+            productName: {
+              contains: "24k chinese gold bar",
+              mode: "insensitive",
+            },
+          },
+        ],
+      });
+      break;
+
+    default:
+      break;
+  }
+
   const where: Prisma.ProductWhereInput =
-    trimmedSearch.length > 0
+    conditions.length > 0
       ? {
-          OR: [
-            {
-              productName: {
-                contains: trimmedSearch,
-                mode: "insensitive",
-              },
-            },
-            {
-              supplier: {
-                contains: trimmedSearch,
-                mode: "insensitive",
-              },
-            },
-            {
-              productIdShopee: {
-                contains: trimmedSearch,
-                mode: "insensitive",
-              },
-            },
-            {
-              variationIdShopee: {
-                contains: trimmedSearch,
-                mode: "insensitive",
-              },
-            },
-            {
-              productIdLazada: {
-                contains: trimmedSearch,
-                mode: "insensitive",
-              },
-            },
-            {
-              skuIdLazada: {
-                contains: trimmedSearch,
-                mode: "insensitive",
-              },
-            },
-            {
-              productIdTiktok: {
-                contains: trimmedSearch,
-                mode: "insensitive",
-              },
-            },
-            {
-              skuIdTiktok: {
-                contains: trimmedSearch,
-                mode: "insensitive",
-              },
-            },
-            {
-              masterCategory: {
-                contains: trimmedSearch,
-                mode: "insensitive",
-              },
-            },
-            {
-              variationNameShopee: {
-                contains: trimmedSearch,
-                mode: "insensitive",
-              },
-            },
-            {
-              variationNameLazada: {
-                contains: trimmedSearch,
-                mode: "insensitive",
-              },
-            },
-            {
-              variationNameTiktok: {
-                contains: trimmedSearch,
-                mode: "insensitive",
-              },
-            },
-            {
-              gramRange: {
-                contains: trimmedSearch,
-                mode: "insensitive",
-              },
-            },
-          ],
+          AND: conditions,
         }
       : {};
-
-  /*
-   * Run the product query and count query together.
-   */
 
   const [products, total] = await prisma.$transaction([
     prisma.product.findMany({
@@ -154,9 +266,7 @@ export const getAllProducts = async ({
       limit: safeLimit,
       total,
       totalPages,
-
       hasNextPage: safePage < totalPages,
-
       hasPreviousPage: safePage > 1,
     },
   };
@@ -199,20 +309,11 @@ export const createProduct = async (dto: CreateProductDTO) => {
 
           stock: row.stock,
 
-          // --------------------------------
-          // Shopee
-          // --------------------------------
-          // New products do NOT automatically
-          // receive a Shopee variation name.
           variationNameShopee: null,
 
           productIdShopee: null,
           variationIdShopee: null,
 
-          // --------------------------------
-          // Lazada
-          // --------------------------------
-          // User's Variation input goes here.
           variationNameLazada:
             row.variationName?.trim() === "" ? null : row.variationName ?? null,
 
@@ -221,11 +322,6 @@ export const createProduct = async (dto: CreateProductDTO) => {
           keyLazada: null,
           quantityLazada: null,
 
-          // --------------------------------
-          // TikTok
-          // --------------------------------
-          // TikTok uses "Default" when there
-          // is no variation name.
           variationNameTiktok:
             row.variationName?.trim() === ""
               ? "Default"

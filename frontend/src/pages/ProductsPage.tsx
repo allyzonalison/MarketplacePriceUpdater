@@ -17,6 +17,7 @@ const ProductsPage = () => {
   const [selectedFilter, setSelectedFilter] = useState("all");
 
   const [isEditMode, setIsEditMode] = useState(false);
+
   const [loading, setLoading] = useState(true);
 
   const [selectedProduct, setSelectedProduct] = useState<Product | null>(null);
@@ -29,11 +30,14 @@ const ProductsPage = () => {
 
   const [isDeleteModalOpen, setIsDeleteModalOpen] = useState(false);
 
-  const refreshProducts = async (search = searchText) => {
+  const refreshProducts = async (
+    search = searchText,
+    filter = selectedFilter
+  ) => {
     try {
       setLoading(true);
 
-      const data = await getProducts(search);
+      const data = await getProducts(search, filter);
 
       setProducts(data);
     } catch (error) {
@@ -49,15 +53,21 @@ const ProductsPage = () => {
     }
   };
 
+  // Search
   useEffect(() => {
     const timer = setTimeout(() => {
-      void refreshProducts();
+      void refreshProducts(searchText, selectedFilter);
     }, 300);
 
     return () => {
       clearTimeout(timer);
     };
   }, [searchText]);
+
+  // Dropdown filter
+  useEffect(() => {
+    void refreshProducts(searchText, selectedFilter);
+  }, [selectedFilter]);
 
   const handlePreview = (previewProducts: Product[]) => {
     setProducts((currentProducts) =>
@@ -83,13 +93,14 @@ const ProductsPage = () => {
     try {
       await deleteProduct(selectedProduct.id);
 
-      await refreshProducts();
+      await refreshProducts(searchText, selectedFilter);
 
       setSelectedProduct(null);
 
       setIsDeleteModalOpen(false);
     } catch (error) {
       console.error(error);
+
       alert("Failed to delete product.");
     }
   };
@@ -97,7 +108,12 @@ const ProductsPage = () => {
   return (
     <>
       <div className="flex h-screen bg-gray-100">
-        <Sidebar onPreview={handlePreview} onApplySuccess={refreshProducts} />
+        <Sidebar
+          onPreview={handlePreview}
+          onApplySuccess={async () => {
+            await refreshProducts(searchText, selectedFilter);
+          }}
+        />
 
         <main className="flex flex-1 flex-col overflow-hidden p-6">
           <Toolbar
@@ -144,7 +160,9 @@ const ProductsPage = () => {
         isEditMode={isEditMode}
         productGroup={selectedProductGroup}
         onClose={() => setIsProductModalOpen(false)}
-        onSaveSuccess={refreshProducts}
+        onSaveSuccess={async () => {
+          await refreshProducts(searchText, selectedFilter);
+        }}
       />
 
       <ConfirmModal

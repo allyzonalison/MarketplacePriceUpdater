@@ -8,21 +8,23 @@ export interface CreateProductPayload {
   rows: {
     variationName: string;
     supplier: string;
-
     grams: string;
     pricePerGram: number | null;
     sellingPrice: number;
-
     stock: number;
   }[];
 }
 
-export const getProducts = async (search = ""): Promise<Product[]> => {
+export const getProducts = async (
+  search = "",
+  filter = "all"
+): Promise<Product[]> => {
   const response = await api.get("/products", {
     params: {
       page: 1,
-      limit: 50,
+      limit: 5000,
       search,
+      filter,
     },
   });
 
@@ -40,11 +42,13 @@ export const updateProduct = async (
   };
 
   const response = await api.patch(`/products/${id}`, payload);
+
   return response.data;
 };
 
 export const createProduct = async (data: CreateProductPayload) => {
   const response = await api.post("/products", data);
+
   return response.data;
 };
 

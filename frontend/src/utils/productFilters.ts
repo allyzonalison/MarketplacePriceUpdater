@@ -1,50 +1,84 @@
 import type { Product } from "../types/product";
 
 export function matchesFilter(product: Product, filter: string): boolean {
-  if (filter === "all") return true;
+  // -----------------------------
+  // ALL PRODUCTS
+  // -----------------------------
 
-  // Categories
+  if (!filter || filter === "all") {
+    return true;
+  }
+
+  const productName = String(product.productName ?? "").toLowerCase();
+
+  const masterCategory = String(product.masterCategory ?? "").toLowerCase();
+
+  const supplier = String(product.supplier ?? "").toLowerCase();
+
+  // -----------------------------
+  // CATEGORIES
+  // -----------------------------
+
   if (
-    ["Earrings", "Pendant", "Bracelet_Anklet", "Necklace", "Ring"].includes(
-      filter
+    ["earrings", "pendant", "bracelet_anklet", "necklace", "ring"].includes(
+      filter.toLowerCase()
     )
   ) {
-    return product.masterCategory === filter;
+    return masterCategory === filter.toLowerCase();
   }
 
-  // Suppliers
-  if (["668", "FG", "SK", "GS"].includes(filter)) {
-    return product.supplier === filter;
+  // -----------------------------
+  // SUPPLIERS
+  // -----------------------------
+
+  if (["668", "fg", "sk", "gs"].includes(filter.toLowerCase())) {
+    return supplier === filter.toLowerCase();
   }
 
-  // Special filters
-  const name = product.productName.toLowerCase();
+  // -----------------------------
+  // ELECTROFORM
+  // -----------------------------
 
-  switch (filter) {
-    case "Electroform":
-      return name.includes("electroform");
-
-    case "Couple Rings":
-      return name.includes("couple");
-
-    case "24K Gold Rings":
-      return (
-        product.productName === "Pawnable 24K Gold Solid Slim Plain Ring" ||
-        product.productName === "Pawnable 24K Gold Slim Plain Ring"
-      );
-
-    case "Manual Pricing":
-      return [
-        "pearl",
-        "piyao",
-        "coral",
-        "customize",
-        "24k gold bar",
-        "24k mini chinese gold bar",
-        "24k chinese gold bar",
-      ].some((keyword) => name.includes(keyword));
-
-    default:
-      return true;
+  if (filter === "Electroform") {
+    return productName.includes("electroform");
   }
+
+  // -----------------------------
+  // COUPLE RINGS
+  // -----------------------------
+
+  if (filter === "Couple Rings") {
+    return productName.includes("couple");
+  }
+
+  // -----------------------------
+  // 24K GOLD RINGS
+  // -----------------------------
+
+  if (filter === "24K Gold Rings") {
+    return (
+      productName === "pawnable 24k gold solid slim plain ring" ||
+      productName === "pawnable 24k gold slim plain ring"
+    );
+  }
+
+  // -----------------------------
+  // MANUAL PRICING
+  // -----------------------------
+
+  if (filter === "Manual Pricing") {
+    const manualKeywords = [
+      "pearl",
+      "piyao",
+      "coral",
+      "customize",
+      "24k gold bar",
+      "24k mini chinese gold bar",
+      "24k chinese gold bar",
+    ];
+
+    return manualKeywords.some((keyword) => productName.includes(keyword));
+  }
+
+  return true;
 }
