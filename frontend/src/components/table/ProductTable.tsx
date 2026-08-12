@@ -31,17 +31,17 @@ const columnDefs: ColDef<Product>[] = [
     flex: 1,
   },
   {
-    headerName: "Variation Name Shopee",
-    field: "variationNameShopee",
-    flex: 1,
-    minWidth: 180,
-    editable: true,
-  },
-  {
     headerName: "Variation Name Lazada",
     field: "variationNameLazada",
     flex: 1,
-    minWidth: 180,
+    minWidth: 90,
+    editable: true,
+  },
+  {
+    headerName: "Variation Name Shopee",
+    field: "variationNameShopee",
+    flex: 1,
+    minWidth: 90,
     editable: true,
   },
   {
