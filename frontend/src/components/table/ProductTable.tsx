@@ -31,10 +31,17 @@ const columnDefs: ColDef<Product>[] = [
     flex: 1,
   },
   {
-    headerName: "Variation Name",
+    headerName: "Variation Name Shopee",
     field: "variationNameShopee",
     flex: 1,
-    minWidth: 140,
+    minWidth: 180,
+    editable: true,
+  },
+  {
+    headerName: "Variation Name Lazada",
+    field: "variationNameLazada",
+    flex: 1,
+    minWidth: 180,
     editable: true,
   },
   {
@@ -95,6 +102,10 @@ const ProductTable = ({
 
     if (field === "variationNameShopee") {
       updatedData.variationNameShopee = event.data.variationNameShopee;
+    }
+
+    if (field === "variationNameLazada") {
+      updatedData.variationNameLazada = event.data.variationNameLazada;
     }
 
     if (field === "gramRange") {
