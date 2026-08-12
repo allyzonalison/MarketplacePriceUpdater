@@ -29,9 +29,12 @@ const ProductsPage = () => {
 
   const [isDeleteModalOpen, setIsDeleteModalOpen] = useState(false);
 
-  const refreshProducts = async () => {
+  const refreshProducts = async (search = searchText) => {
     try {
-      const data = await getProducts();
+      setLoading(true);
+
+      const data = await getProducts(search);
+
       setProducts(data);
     } catch (error) {
       console.error(error);
@@ -47,8 +50,14 @@ const ProductsPage = () => {
   };
 
   useEffect(() => {
-    void refreshProducts();
-  }, []);
+    const timer = setTimeout(() => {
+      void refreshProducts(searchText);
+    }, 300);
+
+    return () => {
+      clearTimeout(timer);
+    };
+  }, [searchText]);
 
   const handlePreview = (previewProducts: Product[]) => {
     setProducts((currentProducts) =>

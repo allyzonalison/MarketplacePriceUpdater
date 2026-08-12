@@ -17,8 +17,14 @@ export interface CreateProductPayload {
   }[];
 }
 
-export const getProducts = async (): Promise<Product[]> => {
-  const response = await api.get("/products");
+export const getProducts = async (search = ""): Promise<Product[]> => {
+  const response = await api.get("/products", {
+    params: {
+      page: 1,
+      limit: 50,
+      search,
+    },
+  });
 
   return response.data.products;
 };

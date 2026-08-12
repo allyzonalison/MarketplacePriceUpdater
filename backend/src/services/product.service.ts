@@ -88,6 +88,36 @@ export const getAllProducts = async ({
                 mode: "insensitive",
               },
             },
+            {
+              masterCategory: {
+                contains: trimmedSearch,
+                mode: "insensitive",
+              },
+            },
+            {
+              variationNameShopee: {
+                contains: trimmedSearch,
+                mode: "insensitive",
+              },
+            },
+            {
+              variationNameLazada: {
+                contains: trimmedSearch,
+                mode: "insensitive",
+              },
+            },
+            {
+              variationNameTiktok: {
+                contains: trimmedSearch,
+                mode: "insensitive",
+              },
+            },
+            {
+              gramRange: {
+                contains: trimmedSearch,
+                mode: "insensitive",
+              },
+            },
           ],
         }
       : {};

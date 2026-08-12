@@ -86,26 +86,8 @@ const ProductTable = ({
   onSelectedProductChange,
 }: ProductTableProps) => {
   const filteredProducts = useMemo(() => {
-    return products.filter((product) => {
-      const matchesSearch =
-        searchText.trim() === "" ||
-        [
-          product.productName,
-          product.masterCategory,
-          product.variationNameShopee,
-          product.supplier,
-          product.gramRange,
-        ]
-          .filter(Boolean)
-          .some((value) =>
-            String(value).toLowerCase().includes(searchText.toLowerCase())
-          );
-
-      const matchesCategory = matchesFilter(product, selectedFilter);
-
-      return matchesSearch && matchesCategory;
-    });
-  }, [products, searchText, selectedFilter]);
+    return products.filter((product) => matchesFilter(product, selectedFilter));
+  }, [products, selectedFilter]);
 
   const handleCellValueChanged = async (
     event: CellValueChangedEvent<Product>
