@@ -99,6 +99,31 @@ export const exportShopee = async (buffer: Buffer) => {
     // FAST LOOKUP
     const product = productMap.get(key);
 
+    if (
+      productName.toLowerCase().includes("no lock") ||
+      variationName.toLowerCase().includes("no lock")
+    ) {
+      console.log("========== NO LOCK DEBUG ==========");
+      console.log("Excel Product:", JSON.stringify(productName));
+      console.log("Excel Variation:", JSON.stringify(variationName));
+      console.log("Key:", JSON.stringify(key));
+
+      console.log(
+        "MATCHED PRODUCT:",
+        product
+          ? {
+              id: product.id,
+              productName: JSON.stringify(product.productName),
+              variationNameShopee: JSON.stringify(product.variationNameShopee),
+              price: product.price,
+              supplier: product.supplier,
+            }
+          : "❌ NO MATCH"
+      );
+
+      console.log("===================================");
+    }
+
     if (!product) {
       console.warn("====================================");
       console.warn("❌ SHOPEE PRODUCT NOT MATCHED");
