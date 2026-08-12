@@ -51,7 +51,7 @@ const ProductsPage = () => {
 
   useEffect(() => {
     const timer = setTimeout(() => {
-      void refreshProducts(searchText);
+      void refreshProducts();
     }, 300);
 
     return () => {
@@ -131,7 +131,6 @@ const ProductsPage = () => {
           <div className="mt-6 flex-1 overflow-hidden">
             <ProductTable
               products={products}
-              searchText={searchText}
               selectedFilter={selectedFilter}
               loading={loading}
               onSelectedProductChange={setSelectedProduct}

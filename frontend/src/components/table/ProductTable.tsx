@@ -72,7 +72,6 @@ const columnDefs: ColDef<Product>[] = [
 
 interface ProductTableProps {
   products: Product[];
-  searchText: string;
   selectedFilter: string;
   loading: boolean;
   onSelectedProductChange: (product: Product | null) => void;
@@ -80,7 +79,6 @@ interface ProductTableProps {
 
 const ProductTable = ({
   products,
-  searchText,
   selectedFilter,
   loading,
   onSelectedProductChange,
