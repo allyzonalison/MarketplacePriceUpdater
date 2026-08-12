@@ -145,11 +145,24 @@ const ProductModal = ({
   };
 
   const handleAddVariant = () => {
-    setRows((previous) => [...previous, createVariant()]);
+    const newVariant = createVariant();
+
+    setRows((previous) => [...previous, newVariant]);
+
+    // Automatically select the newly added variant
+    setSelectedVariantClientId(newVariant.clientId);
   };
 
   const handleRemoveVariant = () => {
-    if (!selectedVariantClientId) return;
+    if (!selectedVariantClientId) {
+      alert("Please select a variant first.");
+      return;
+    }
+
+    if (rows.length <= 1) {
+      alert("A product must have at least one variant.");
+      return;
+    }
 
     const rowToDelete = rows.find(
       (row) => row.clientId === selectedVariantClientId
