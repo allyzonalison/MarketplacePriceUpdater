@@ -1,17 +1,17 @@
 interface ProgressModalProps {
   visible: boolean;
   title: string;
-  completed?: number;
-  total?: number;
-  percent?: number;
+  completed: number;
+  total: number;
+  percent: number;
 }
 
 const ProgressModal = ({
   visible,
   title,
-  completed = 0,
-  total = 0,
-  percent = 0,
+  completed,
+  total,
+  percent,
 }: ProgressModalProps) => {
   if (!visible) {
     return null;
@@ -29,7 +29,7 @@ const ProgressModal = ({
         <div className="mt-8">
           <div className="h-4 w-full overflow-hidden rounded-full bg-gray-200">
             <div
-              className="h-full rounded-full bg-blue-600 transition-all duration-300"
+              className="h-full rounded-full bg-blue-600 transition-all duration-200"
               style={{
                 width: `${percent}%`,
               }}
@@ -38,7 +38,7 @@ const ProgressModal = ({
 
           <div className="mt-3 flex justify-between text-sm font-medium">
             <span>
-              {completed} / {total}
+              {completed.toLocaleString()} / {total.toLocaleString()}
             </span>
 
             <span>{percent}%</span>

@@ -17,12 +17,8 @@ export const previewGroupPrice = async (
 
 export const applyGroupPrice = async (
   data: PreviewPriceRequest
-): Promise<{
-  total: number;
-}> => {
-  const response = await api.post("/prices/apply", data);
-
-  return response.data;
+): Promise<void> => {
+  await api.post("/prices/apply", data);
 };
 
 export interface CurrentPrices {

@@ -19,8 +19,11 @@ export const ProgressProvider = ({ children }: { children: ReactNode }) => {
       total: number;
       percent: number;
     }) => {
+      console.log("📊 PRICE PROGRESS:", data);
+
       setProgress((current) => ({
         ...current,
+        visible: true,
         completed: data.completed,
         total: data.total,
         percent: data.percent,
@@ -28,19 +31,45 @@ export const ProgressProvider = ({ children }: { children: ReactNode }) => {
     };
 
     const handleComplete = () => {
+      console.log("✅ PRICE UPDATE COMPLETE");
+
       setProgress((current) => ({
         ...current,
         completed: current.total,
         percent: 100,
       }));
+
+      setTimeout(() => {
+        setProgress({
+          visible: false,
+          title: "",
+          completed: 0,
+          total: 0,
+          percent: 0,
+        });
+      }, 500);
+    };
+
+    const handleError = () => {
+      console.error("❌ PRICE UPDATE ERROR");
+
+      setProgress({
+        visible: false,
+        title: "",
+        completed: 0,
+        total: 0,
+        percent: 0,
+      });
     };
 
     socket.on("price-update-progress", handleProgress);
     socket.on("price-update-complete", handleComplete);
+    socket.on("price-update-error", handleError);
 
     return () => {
       socket.off("price-update-progress", handleProgress);
       socket.off("price-update-complete", handleComplete);
+      socket.off("price-update-error", handleError);
     };
   }, []);
 

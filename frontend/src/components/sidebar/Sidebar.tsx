@@ -15,8 +15,6 @@ import { useProgress } from "../../hooks/useProgress";
 
 import type { Product } from "../../types/product";
 
-import socket from "../../services/socket";
-
 interface SidebarProps {
   onPreview: (products: Product[]) => void;
   onApplySuccess: () => Promise<void>;
@@ -34,11 +32,13 @@ const Sidebar = ({ onPreview, onApplySuccess }: SidebarProps) => {
 
   const [isShopeeModalOpen, setIsShopeeModalOpen] = useState(false);
 
-  const { showProgress, hideProgress } = useProgress();
+  const { showProgress } = useProgress();
 
   const loadCurrentPrices = async () => {
     try {
       const prices = await getCurrentPrices();
+
+      console.log("Prices from API:", prices);
 
       setCurrentPrices(prices);
     } catch (error) {
@@ -49,53 +49,6 @@ const Sidebar = ({ onPreview, onApplySuccess }: SidebarProps) => {
   useEffect(() => {
     loadCurrentPrices();
   }, []);
-
-  /*
-   * Listen for the BACKGROUND update finishing.
-   */
-  useEffect(() => {
-    const handleComplete = async () => {
-      console.log("🎉 Sidebar: price update complete");
-
-      try {
-        /*
-         * Refresh the product table.
-         */
-        await onApplySuccess();
-
-        /*
-         * Refresh the prices shown in sidebar.
-         */
-        await loadCurrentPrices();
-
-        alert("Prices applied successfully!");
-      } catch (error) {
-        console.error("Failed to refresh after price update:", error);
-      } finally {
-        setLoading(false);
-      }
-    };
-
-    const handleError = () => {
-      console.error("❌ Sidebar: price update failed");
-
-      hideProgress();
-
-      setLoading(false);
-
-      alert("Failed to update prices. Please check the backend logs.");
-    };
-
-    socket.on("price-update-complete", handleComplete);
-
-    socket.on("price-update-error", handleError);
-
-    return () => {
-      socket.off("price-update-complete", handleComplete);
-
-      socket.off("price-update-error", handleError);
-    };
-  }, [onApplySuccess, hideProgress]);
 
   const handlePreview = async () => {
     if (!group || !pricePerGram) {
@@ -115,7 +68,6 @@ const Sidebar = ({ onPreview, onApplySuccess }: SidebarProps) => {
       onPreview(previewProducts);
     } catch (error) {
       console.error(error);
-
       alert("Failed to preview prices.");
     } finally {
       setLoading(false);
@@ -139,30 +91,23 @@ const Sidebar = ({ onPreview, onApplySuccess }: SidebarProps) => {
 
       showProgress(`Updating ${group} products...`);
 
-      /*
-       * IMPORTANT:
-       *
-       * This request now returns quickly.
-       *
-       * The actual update continues in the
-       * backend and reports progress through
-       * Socket.IO.
-       */
       await applyGroupPrice({
         group,
         supplier,
         pricePerGram: Number(pricePerGram),
       });
 
-      console.log("Price update started successfully.");
+      await onApplySuccess();
+
+      await loadCurrentPrices();
+
+      alert("Prices applied successfully!");
     } catch (error) {
-      console.error("Failed to start price update:", error);
+      console.error("PRICE APPLY ERROR:", error);
 
-      hideProgress();
-
+      alert("Failed to apply prices.");
+    } finally {
       setLoading(false);
-
-      alert("Failed to start price update.");
     }
   };
 
@@ -178,13 +123,9 @@ const Sidebar = ({ onPreview, onApplySuccess }: SidebarProps) => {
             className="mb-3 w-full rounded-lg border border-gray-300 px-3 py-2"
           >
             <option value="">Select Price Group</option>
-
             <option value="REGULAR">Regular Items</option>
-
             <option value="ELECTROFORM">Electroform</option>
-
             <option value="RING_24K">24K Gold Rings</option>
-
             <option value="COUPLE">Couple Rings</option>
           </select>
 
@@ -194,13 +135,9 @@ const Sidebar = ({ onPreview, onApplySuccess }: SidebarProps) => {
             className="mb-3 w-full rounded-lg border border-gray-300 px-3 py-2"
           >
             <option value="ALL">All Suppliers</option>
-
             <option value="668">668</option>
-
             <option value="FG">FG</option>
-
             <option value="SK">SK</option>
-
             <option value="GS">GS</option>
           </select>
 
@@ -239,7 +176,6 @@ const Sidebar = ({ onPreview, onApplySuccess }: SidebarProps) => {
           <div className="space-y-3 text-sm">
             <div className="flex justify-between">
               <span>Regular Items</span>
-
               <span>
                 ₱{currentPrices?.regularItems?.toLocaleString() ?? "-"}
               </span>
@@ -247,7 +183,6 @@ const Sidebar = ({ onPreview, onApplySuccess }: SidebarProps) => {
 
             <div className="flex justify-between">
               <span>Electroform</span>
-
               <span>
                 ₱{currentPrices?.electroform?.toLocaleString() ?? "-"}
               </span>
@@ -255,13 +190,11 @@ const Sidebar = ({ onPreview, onApplySuccess }: SidebarProps) => {
 
             <div className="flex justify-between">
               <span>24K Gold Rings</span>
-
               <span>₱{currentPrices?.rings24k?.toLocaleString() ?? "-"}</span>
             </div>
 
             <div className="flex justify-between">
               <span>Couple Rings</span>
-
               <span>
                 ₱{currentPrices?.coupleRings?.toLocaleString() ?? "-"}
               </span>
@@ -305,7 +238,6 @@ const Sidebar = ({ onPreview, onApplySuccess }: SidebarProps) => {
             }
 
             localStorage.removeItem("token");
-
             window.location.reload();
           }}
           className="w-full rounded-lg bg-red-600 py-3 font-semibold text-white transition hover:bg-red-700"
@@ -330,15 +262,12 @@ const Sidebar = ({ onPreview, onApplySuccess }: SidebarProps) => {
             a.download = "Shopee_Updated.zip";
 
             document.body.appendChild(a);
-
             a.click();
-
             document.body.removeChild(a);
 
             window.URL.revokeObjectURL(url);
           } catch (err) {
             console.error("EXPORT ERROR:", err);
-
             throw err;
           }
         }}
