@@ -111,7 +111,6 @@ const VariantsGrid = ({
         isWholeNumber(params.value) ? null : { backgroundColor: "#FEE2E2" },
     },
   ];
-
   const marketplaceColumns: ColDef<VariantRow>[] = [
     // -------------------------
     // SHOPEE
@@ -120,16 +119,19 @@ const VariantsGrid = ({
       headerName: "Shopee Product ID",
       field: "productIdShopee",
       width: 180,
+      editable: true,
     },
     {
       headerName: "Shopee Variation ID",
       field: "variationIdShopee",
       width: 180,
+      editable: true,
     },
     {
       headerName: "Shopee Variation Name",
       field: "variationNameShopee",
       width: 180,
+      editable: true,
     },
 
     // -------------------------
@@ -139,16 +141,19 @@ const VariantsGrid = ({
       headerName: "Lazada Product ID",
       field: "productIdLazada",
       width: 180,
+      editable: true,
     },
     {
       headerName: "Lazada SKU ID",
       field: "skuIdLazada",
       width: 180,
+      editable: true,
     },
     {
       headerName: "Lazada Key",
       field: "keyLazada",
       width: 180,
+      editable: true,
     },
     {
       headerName: "Lazada Qty",
@@ -164,6 +169,7 @@ const VariantsGrid = ({
       headerName: "Lazada Variation Name",
       field: "variationNameLazada",
       width: 180,
+      editable: true,
     },
 
     // -------------------------
@@ -173,16 +179,19 @@ const VariantsGrid = ({
       headerName: "TikTok Product ID",
       field: "productIdTiktok",
       width: 180,
+      editable: true,
     },
     {
       headerName: "TikTok SKU ID",
       field: "skuIdTiktok",
       width: 180,
+      editable: true,
     },
     {
       headerName: "TikTok Category",
       field: "categoryTiktok",
       width: 180,
+      editable: true,
     },
     {
       headerName: "TikTok Qty",
@@ -198,6 +207,7 @@ const VariantsGrid = ({
       headerName: "TikTok Variation Name",
       field: "variationNameTiktok",
       width: 180,
+      editable: true,
     },
   ];
 
