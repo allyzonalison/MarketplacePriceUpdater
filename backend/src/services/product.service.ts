@@ -343,7 +343,7 @@ export const createProduct = async (dto: CreateProductDTO) => {
           // --------------------------------
           // Use entered variation.
           // If there is no variation, use Default.
-          variationNameTiktok: variationName ?? "Default",
+          variationNameTiktok: hasMultipleVariants ? variationName : "Default",
 
           productIdTiktok: null,
           skuIdTiktok: null,
