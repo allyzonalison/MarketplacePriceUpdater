@@ -8,8 +8,10 @@ import {
 } from "../../services/pricingService";
 
 import { exportShopee } from "../../services/exportService";
+import { exportLazada } from "../../services/lazadaExportService";
 
 import MarketplaceExportModal from "../modals/MarketplaceExportModal";
+import LazadaExportModal from "../modals/lazada/LazadaExportModal";
 
 import { useProgress } from "../../hooks/useProgress";
 
@@ -31,6 +33,7 @@ const Sidebar = ({ onPreview, onApplySuccess }: SidebarProps) => {
   );
 
   const [isShopeeModalOpen, setIsShopeeModalOpen] = useState(false);
+  const [isLazadaModalOpen, setIsLazadaModalOpen] = useState(false);
 
   const { showProgress } = useProgress();
 
@@ -215,7 +218,10 @@ const Sidebar = ({ onPreview, onApplySuccess }: SidebarProps) => {
               Shopee
             </button>
 
-            <button className="w-full rounded-lg bg-[#6C2BD9] py-3 font-semibold text-white hover:opacity-90">
+            <button
+              onClick={() => setIsLazadaModalOpen(true)}
+              className="w-full rounded-lg bg-[#6C2BD9] py-3 font-semibold text-white hover:opacity-90"
+            >
               Lazada
             </button>
 
@@ -268,6 +274,32 @@ const Sidebar = ({ onPreview, onApplySuccess }: SidebarProps) => {
             window.URL.revokeObjectURL(url);
           } catch (err) {
             console.error("EXPORT ERROR:", err);
+            throw err;
+          }
+        }}
+      />
+
+      <LazadaExportModal
+        isOpen={isLazadaModalOpen}
+        onClose={() => setIsLazadaModalOpen(false)}
+        onGenerate={async (file) => {
+          try {
+            const blob = await exportLazada(file);
+
+            const url = window.URL.createObjectURL(blob);
+
+            const a = document.createElement("a");
+
+            a.href = url;
+            a.download = "Lazada_Updated.xlsx";
+
+            document.body.appendChild(a);
+            a.click();
+            document.body.removeChild(a);
+
+            window.URL.revokeObjectURL(url);
+          } catch (err) {
+            console.error("LAZADA EXPORT ERROR:", err);
             throw err;
           }
         }}

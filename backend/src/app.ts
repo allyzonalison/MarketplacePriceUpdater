@@ -4,6 +4,7 @@ import cors from "cors";
 import productRoutes from "./routes/product.routes.js";
 import priceRoutes from "./routes/price.routes.js";
 import shopeeExportRoutes from "./routes/shopeeExport.routes.js";
+import lazadaExportRoutes from "./routes/lazadaExport.routes.js";
 
 import authRoutes from "./routes/auth.routes.js";
 
@@ -28,6 +29,7 @@ app.get("/", (_req, res) => {
 app.use("/products", productRoutes);
 app.use("/prices", priceRoutes);
 app.use("/exports", shopeeExportRoutes);
+app.use("/exports", lazadaExportRoutes);
 
 app.use("/auth", authRoutes);
 
