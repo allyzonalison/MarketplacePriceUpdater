@@ -79,15 +79,17 @@ const columnDefs: ColDef<Product>[] = [
 
 interface ProductTableProps {
   products: Product[];
+  searchText: string;
   selectedFilter: string;
   loading: boolean;
-  onSelectedProductChange: (product: Product | null) => void;
+  onSelectedProductsChange: (products: Product[]) => void;
 }
 
 const ProductTable = ({
   products,
+  searchText,
   loading,
-  onSelectedProductChange,
+  onSelectedProductsChange,
 }: ProductTableProps) => {
   const rowData = useMemo(() => {
     return products;
@@ -160,9 +162,9 @@ const ProductTable = ({
   };
 
   const handleSelectionChanged = (event: SelectionChangedEvent<Product>) => {
-    const selected = event.api.getSelectedRows()[0] ?? null;
+    const selectedProducts = event.api.getSelectedRows();
 
-    onSelectedProductChange(selected);
+    onSelectedProductsChange(selectedProducts);
   };
 
   return (
@@ -175,7 +177,8 @@ const ProductTable = ({
           onCellValueChanged={handleCellValueChanged}
           onSelectionChanged={handleSelectionChanged}
           rowSelection={{
-            mode: "singleRow",
+            mode: "multiRow",
+            headerCheckbox: searchText.trim().length > 0,
           }}
           animateRows
           defaultColDef={{

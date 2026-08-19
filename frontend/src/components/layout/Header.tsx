@@ -8,6 +8,10 @@ interface ToolbarProps {
   onAddProduct: () => void;
   onEditProduct: () => void;
   onDeleteProduct: () => void;
+
+  addDisabled: boolean;
+  editDisabled: boolean;
+  deleteDisabled: boolean;
 }
 
 const Toolbar = ({
@@ -20,6 +24,10 @@ const Toolbar = ({
   onAddProduct,
   onEditProduct,
   onDeleteProduct,
+
+  addDisabled,
+  editDisabled,
+  deleteDisabled,
 }: ToolbarProps) => {
   return (
     <div className="rounded-lg border border-gray-200 bg-white p-4 shadow-sm">
@@ -69,21 +77,24 @@ const Toolbar = ({
         <div className="flex gap-2">
           <button
             onClick={onAddProduct}
-            className="rounded-lg bg-blue-600 px-5 py-2 font-medium text-white hover:bg-blue-700"
+            disabled={addDisabled}
+            className="rounded-lg bg-blue-600 px-5 py-2 font-medium text-white hover:bg-blue-700 disabled:cursor-not-allowed disabled:opacity-50"
           >
             Add Product
           </button>
 
           <button
             onClick={onEditProduct}
-            className="rounded-lg bg-gray-200 px-5 py-2 font-medium hover:bg-gray-300"
+            disabled={editDisabled}
+            className="rounded-lg bg-gray-200 px-5 py-2 font-medium hover:bg-gray-300 disabled:cursor-not-allowed disabled:opacity-50"
           >
             Edit
           </button>
 
           <button
             onClick={onDeleteProduct}
-            className="rounded-lg bg-red-500 px-5 py-2 font-medium text-white hover:bg-red-600"
+            disabled={deleteDisabled}
+            className="rounded-lg bg-red-500 px-5 py-2 font-medium text-white hover:bg-red-600 disabled:cursor-not-allowed disabled:opacity-50"
           >
             Delete
           </button>

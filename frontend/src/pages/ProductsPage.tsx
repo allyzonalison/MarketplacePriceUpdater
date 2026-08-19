@@ -20,7 +20,9 @@ const ProductsPage = () => {
 
   const [loading, setLoading] = useState(true);
 
-  const [selectedProduct, setSelectedProduct] = useState<Product | null>(null);
+  const [selectedProducts, setSelectedProducts] = useState<Product[]>([]);
+  const selectedProduct =
+    selectedProducts.length === 1 ? selectedProducts[0] : null;
 
   const selectedProductGroup = selectedProduct
     ? products.filter((p) => p.productName === selectedProduct.productName)
@@ -88,20 +90,24 @@ const ProductsPage = () => {
   };
 
   const handleDeleteProduct = async () => {
-    if (!selectedProduct) return;
+    if (selectedProducts.length === 0) {
+      return;
+    }
 
     try {
-      await deleteProduct(selectedProduct.id);
+      await Promise.all(
+        selectedProducts.map((product) => deleteProduct(product.id))
+      );
 
       await refreshProducts(searchText, selectedFilter);
 
-      setSelectedProduct(null);
+      setSelectedProducts([]);
 
       setIsDeleteModalOpen(false);
     } catch (error) {
       console.error(error);
 
-      alert("Failed to delete product.");
+      alert("Failed to delete selected products.");
     }
   };
 
@@ -127,7 +133,6 @@ const ProductsPage = () => {
             }}
             onEditProduct={() => {
               if (!selectedProduct) {
-                alert("Please select a product first.");
                 return;
               }
 
@@ -135,21 +140,24 @@ const ProductsPage = () => {
               setIsProductModalOpen(true);
             }}
             onDeleteProduct={() => {
-              if (!selectedProduct) {
-                alert("Please select a product first.");
+              if (selectedProducts.length === 0) {
                 return;
               }
 
               setIsDeleteModalOpen(true);
             }}
+            addDisabled={selectedProducts.length > 1}
+            editDisabled={selectedProducts.length !== 1}
+            deleteDisabled={selectedProducts.length === 0}
           />
 
           <div className="mt-6 flex-1 overflow-hidden">
             <ProductTable
               products={products}
+              searchText={searchText}
               selectedFilter={selectedFilter}
               loading={loading}
-              onSelectedProductChange={setSelectedProduct}
+              onSelectedProductsChange={setSelectedProducts}
             />
           </div>
         </main>
@@ -167,20 +175,35 @@ const ProductsPage = () => {
 
       <ConfirmModal
         isOpen={isDeleteModalOpen}
-        title="Delete Product"
-        description="Are you sure you want to delete this product? This action cannot be undone."
+        title={
+          selectedProducts.length > 1
+            ? `Delete ${selectedProducts.length} Products`
+            : "Delete Product"
+        }
+        description={
+          selectedProducts.length > 1
+            ? "Are you sure you want to delete all selected products? This action cannot be undone."
+            : "Are you sure you want to delete this product? This action cannot be undone."
+        }
         confirmText="Delete"
         cancelText="Cancel"
         danger
         onConfirm={handleDeleteProduct}
         onCancel={() => setIsDeleteModalOpen(false)}
       >
-        <div className="rounded-lg bg-gray-100 p-4">
-          <p className="font-semibold">{selectedProduct?.productName}</p>
+        <div className="max-h-60 overflow-y-auto rounded-lg bg-gray-100 p-4">
+          {selectedProducts.map((product) => (
+            <div
+              key={product.id}
+              className="border-b border-gray-200 py-2 last:border-b-0"
+            >
+              <p className="font-semibold">{product.productName}</p>
 
-          <p className="mt-1 text-sm text-gray-500">
-            Variation: {selectedProduct?.variationNameShopee}
-          </p>
+              <p className="mt-1 text-sm text-gray-500">
+                Variation: {product.variationNameShopee ?? "NULL"}
+              </p>
+            </div>
+          ))}
         </div>
       </ConfirmModal>
     </>
