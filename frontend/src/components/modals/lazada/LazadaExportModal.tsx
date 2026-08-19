@@ -68,7 +68,9 @@ const LazadaExportModal = ({
       <div className="w-[600px] rounded-xl bg-white p-6 shadow-xl">
         <h2 className="text-2xl font-semibold">Lazada Export</h2>
 
-        <p className="mt-2 text-gray-500">Upload the Lazada Excel Template.</p>
+        <p className="mt-2 text-gray-500">
+          Upload template exported from Lazada.
+        </p>
 
         <div
           className="mt-6 cursor-pointer rounded-lg border-2 border-dashed border-gray-300 p-10 text-center hover:bg-gray-50"
