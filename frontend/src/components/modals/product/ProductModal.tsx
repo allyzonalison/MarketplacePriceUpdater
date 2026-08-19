@@ -141,15 +141,44 @@ const ProductModal = ({
   }, [isOpen, isEditMode, productGroup]);
 
   const handleRowsChange = (updatedRows: VariantRow[]) => {
-    setRows(updatedRows);
+    const previousRowsById = new Map(rows.map((row) => [row.clientId, row]));
+
+    const finalRows = updatedRows.map((row) => {
+      const previousRow = previousRowsById.get(row.clientId);
+
+      // Only apply this behavior to a NEW variant
+      // being added while editing an existing product.
+      if (
+        isEditMode &&
+        row.id === null &&
+        previousRow &&
+        row.variationName !== previousRow.variationName &&
+        row.variationNameTiktok === previousRow.variationNameTiktok
+      ) {
+        return {
+          ...row,
+          variationNameTiktok: row.variationName,
+        };
+      }
+
+      return row;
+    });
+
+    setRows(finalRows);
   };
 
   const handleAddVariant = () => {
-    const newVariant = createVariant();
+    const newVariant: VariantRow = {
+      ...createVariant(),
+
+      // New variant inside an existing product:
+      // TikTok will follow whatever the user enters
+      // in the main Variation Name field.
+      variationNameTiktok: "",
+    };
 
     setRows((previous) => [...previous, newVariant]);
 
-    // Automatically select the newly added variant
     setSelectedVariantClientId(newVariant.clientId);
   };
 
@@ -332,11 +361,24 @@ const ProductModal = ({
      * User input:
      *   variationName
      *
-     * becomes:
-     *   Shopee  -> null
-     *   Lazada  -> user input or null
-     *   TikTok  -> user input or "Default"
+     * becomes according to the backend's
+     * new-product initialization rules:
+     *
+     *   Shopee  -> null for a single variant
+     *   Lazada  -> user input
+     *   TikTok  -> "Default" for a single variant
+     *
+     * For EDITING an existing product:
+     *
+     * Existing rows are updated using their exact
+     * marketplace values.
+     *
+     * Newly added variants to an existing product
+     * also send their marketplace values explicitly,
+     * so they do NOT receive the new-product "Default"
+     * rule.
      */
+
     const payload = {
       productName,
       category,
@@ -350,11 +392,12 @@ const ProductModal = ({
 
     try {
       if (isEditMode) {
+        // Delete variants that were removed from the modal
         await Promise.all(deletedVariantIds.map((id) => deleteProduct(id)));
 
         await Promise.all(
           rows.map((row) => {
-            const payload = {
+            const productPayload = {
               productName,
               masterCategory: category,
 
@@ -368,14 +411,18 @@ const ProductModal = ({
 
               stock: row.stock,
 
+              // --------------------------------
               // Shopee
+              // --------------------------------
               variationNameShopee: row.variationNameShopee,
 
               productIdShopee: row.productIdShopee,
 
               variationIdShopee: row.variationIdShopee,
 
+              // --------------------------------
               // Lazada
+              // --------------------------------
               variationNameLazada: row.variationNameLazada,
 
               productIdLazada: row.productIdLazada,
@@ -386,7 +433,9 @@ const ProductModal = ({
 
               quantityLazada: row.quantityLazada,
 
+              // --------------------------------
               // TikTok
+              // --------------------------------
               variationNameTiktok: row.variationNameTiktok,
 
               productIdTiktok: row.productIdTiktok,
@@ -398,13 +447,33 @@ const ProductModal = ({
               quantityTiktok: row.quantityTiktok,
             };
 
+            /*
+             * Existing variant:
+             *
+             * Update it directly.
+             */
             if (row.id !== null) {
-              return updateProduct(row.id, payload);
+              return updateProduct(row.id, productPayload);
             }
 
+            /*
+             * NEW VARIANT INSIDE AN EXISTING PRODUCT:
+             *
+             * IMPORTANT:
+             *
+             * We explicitly pass all marketplace variation names.
+             * This prevents the backend from applying the
+             * brand-new-product "TikTok = Default" rule.
+             */
             return createProduct({
               productName,
               category,
+
+              // IMPORTANT:
+              // This is NOT a brand-new product.
+              // This is a new variant being added to
+              // an existing product.
+              preserveMarketplaceValues: true,
 
               rows: [
                 {
@@ -420,6 +489,12 @@ const ProductModal = ({
                   sellingPrice: row.sellingPrice ?? 0,
 
                   stock: row.stock,
+
+                  variationNameShopee: row.variationNameShopee,
+
+                  variationNameLazada: row.variationNameLazada,
+
+                  variationNameTiktok: row.variationNameTiktok,
                 },
               ],
             });
@@ -430,6 +505,14 @@ const ProductModal = ({
 
         alert("Product updated successfully!");
       } else {
+        /*
+         * COMPLETELY NEW PRODUCT
+         *
+         * Do NOT pass marketplace variation names here.
+         *
+         * This allows the backend to apply the special
+         * new-product initialization rules.
+         */
         await createProduct(payload);
 
         alert("Product saved successfully!");

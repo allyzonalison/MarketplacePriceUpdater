@@ -316,12 +316,11 @@ export const createProduct = async (dto: CreateProductDTO) => {
           // --------------------------------
           // Shopee
           // --------------------------------
-          // Multiple variants:
-          //   use the entered variation name.
-          //
-          // Single variant:
-          //   ALWAYS null.
-          variationNameShopee: hasMultipleVariants ? variationName : null,
+          variationNameShopee: dto.preserveMarketplaceValues
+            ? row.variationNameShopee ?? null
+            : hasMultipleVariants
+            ? variationName
+            : null,
 
           productIdShopee: null,
           variationIdShopee: null,
@@ -329,9 +328,9 @@ export const createProduct = async (dto: CreateProductDTO) => {
           // --------------------------------
           // Lazada
           // --------------------------------
-          // Always use the entered variation.
-          // Empty input becomes null.
-          variationNameLazada: variationName,
+          variationNameLazada: dto.preserveMarketplaceValues
+            ? row.variationNameLazada ?? null
+            : variationName,
 
           productIdLazada: null,
           skuIdLazada: null,
@@ -341,9 +340,9 @@ export const createProduct = async (dto: CreateProductDTO) => {
           // --------------------------------
           // TikTok
           // --------------------------------
-          // Use entered variation.
-          // If there is no variation, use Default.
-          variationNameTiktok: hasMultipleVariants ? variationName : "Default",
+          variationNameTiktok: dto.preserveMarketplaceValues
+            ? row.variationNameTiktok ?? null
+            : variationName ?? "Default",
 
           productIdTiktok: null,
           skuIdTiktok: null,

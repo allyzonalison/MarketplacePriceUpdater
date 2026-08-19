@@ -5,6 +5,8 @@ export interface CreateProductPayload {
   productName: string;
   category: string;
 
+  preserveMarketplaceValues?: boolean;
+
   rows: {
     variationName: string;
     supplier: string;
@@ -12,6 +14,10 @@ export interface CreateProductPayload {
     pricePerGram: number | null;
     sellingPrice: number;
     stock: number;
+
+    variationNameShopee?: string | null;
+    variationNameLazada?: string | null;
+    variationNameTiktok?: string | null;
   }[];
 }
 
