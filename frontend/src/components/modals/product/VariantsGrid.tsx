@@ -51,7 +51,7 @@ const VariantsGrid = ({
   const variationColumn: ColDef<VariantRow> = {
     headerName: "Variation Name",
     field: "variationName",
-    width: 180,
+    flex: 1,
     editable: true,
   };
 
@@ -59,7 +59,7 @@ const VariantsGrid = ({
     {
       headerName: "Supplier",
       field: "supplier",
-      width: 120,
+      flex: 1,
       editable: true,
       cellEditor: "agSelectCellEditor",
       cellEditorParams: {
@@ -69,7 +69,7 @@ const VariantsGrid = ({
     {
       headerName: "Grams",
       field: "grams",
-      width: 120,
+      flex: 1,
       editable: true,
       cellStyle: (params) =>
         isValidWeightRange(params.value)
@@ -79,7 +79,7 @@ const VariantsGrid = ({
     {
       headerName: "Price / Gram",
       field: "pricePerGram",
-      width: 130,
+      flex: 1,
       editable: true,
 
       valueParser: (params) => {
@@ -93,7 +93,7 @@ const VariantsGrid = ({
     {
       headerName: "Selling Price",
       field: "sellingPrice",
-      width: 130,
+      flex: 1,
       editable: (params) => canEditSellingPrice(params.data),
 
       valueParser: (params) => {
@@ -104,7 +104,7 @@ const VariantsGrid = ({
     {
       headerName: "Stock",
       field: "stock",
-      width: 100,
+      flex: 1,
       editable: true,
 
       cellStyle: (params) =>
@@ -116,19 +116,19 @@ const VariantsGrid = ({
     {
       headerName: "Shopee Variation Name",
       field: "variationNameShopee",
-      width: 180,
+      flex: 1,
       editable: true,
     },
     {
       headerName: "Lazada Variation Name",
       field: "variationNameLazada",
-      width: 180,
+      flex: 1,
       editable: true,
     },
     {
       headerName: "TikTok Variation Name",
       field: "variationNameTiktok",
-      width: 180,
+      flex: 1,
       editable: true,
     },
   ];
