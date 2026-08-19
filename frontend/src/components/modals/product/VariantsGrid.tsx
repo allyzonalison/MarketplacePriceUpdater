@@ -1,4 +1,6 @@
+import { useState } from "react";
 import { AgGridReact } from "ag-grid-react";
+
 import { SUPPLIERS } from "../../../constants/suppliers";
 import { calculateSellingPrice } from "./PriceCalculator";
 
@@ -36,6 +38,12 @@ const VariantsGrid = ({
   onRowsChange,
   onSelectedRowChange,
 }: Props) => {
+  const [bulkPricePerGram, setBulkPricePerGram] = useState("");
+
+  // --------------------------------------------------
+  // SELLING PRICE EDIT RULE
+  // --------------------------------------------------
+
   const canEditSellingPrice = (row: VariantRow | undefined): boolean => {
     if (!row) {
       return false;
@@ -48,12 +56,45 @@ const VariantsGrid = ({
     );
   };
 
+  // --------------------------------------------------
+  // APPLY PRICE / GRAM TO ALL VARIANTS
+  // --------------------------------------------------
+
+  const handleApplyPriceToAll = () => {
+    const price = Number(bulkPricePerGram);
+
+    if (!Number.isFinite(price) || price <= 0) {
+      alert("Please enter a valid Price / Gram.");
+      return;
+    }
+
+    const updatedRows = rows.map((row) => {
+      const sellingPrice = calculateSellingPrice(row.grams, price);
+
+      return {
+        ...row,
+        pricePerGram: price,
+        sellingPrice: sellingPrice !== null ? sellingPrice : row.sellingPrice,
+      };
+    });
+
+    onRowsChange(updatedRows);
+  };
+
+  // --------------------------------------------------
+  // VARIATION COLUMN
+  // --------------------------------------------------
+
   const variationColumn: ColDef<VariantRow> = {
     headerName: "Variation Name",
     field: "variationName",
     flex: 1,
     editable: true,
   };
+
+  // --------------------------------------------------
+  // COMMON EDITABLE COLUMNS
+  // --------------------------------------------------
 
   const commonEditableColumns: ColDef<VariantRow>[] = [
     {
@@ -66,16 +107,19 @@ const VariantsGrid = ({
         values: SUPPLIERS,
       },
     },
+
     {
       headerName: "Grams",
       field: "grams",
       flex: 1,
       editable: true,
+
       cellStyle: (params) =>
         isValidWeightRange(params.value)
           ? null
           : { backgroundColor: "#FEE2E2" },
     },
+
     {
       headerName: "Price / Gram",
       field: "pricePerGram",
@@ -83,24 +127,33 @@ const VariantsGrid = ({
       editable: true,
 
       valueParser: (params) => {
-        if (params.newValue === "") return null;
+        if (params.newValue === "") {
+          return null;
+        }
+
         return Number(params.newValue);
       },
 
       cellStyle: (params) =>
         isPositiveNumber(params.value) ? null : { backgroundColor: "#FEE2E2" },
     },
+
     {
       headerName: "Selling Price",
       field: "sellingPrice",
       flex: 1,
+
       editable: (params) => canEditSellingPrice(params.data),
 
       valueParser: (params) => {
-        if (params.newValue === "") return null;
+        if (params.newValue === "") {
+          return null;
+        }
+
         return Number(params.newValue);
       },
     },
+
     {
       headerName: "Stock",
       field: "stock",
@@ -112,6 +165,10 @@ const VariantsGrid = ({
     },
   ];
 
+  // --------------------------------------------------
+  // MARKETPLACE VARIATION COLUMNS
+  // --------------------------------------------------
+
   const editMarketplaceColumns: ColDef<VariantRow>[] = [
     {
       headerName: "Shopee Variation Name",
@@ -119,12 +176,14 @@ const VariantsGrid = ({
       flex: 1,
       editable: true,
     },
+
     {
       headerName: "Lazada Variation Name",
       field: "variationNameLazada",
       flex: 1,
       editable: true,
     },
+
     {
       headerName: "TikTok Variation Name",
       field: "variationNameTiktok",
@@ -132,6 +191,10 @@ const VariantsGrid = ({
       editable: true,
     },
   ];
+
+  // --------------------------------------------------
+  // COLUMN DEFINITIONS
+  // --------------------------------------------------
 
   const columnDefs: ColDef<VariantRow>[] = isEditMode
     ? [
@@ -167,23 +230,31 @@ const VariantsGrid = ({
           ...commonEditableColumns[0],
           flex: 1,
         },
+
         {
           ...commonEditableColumns[1],
           flex: 1,
         },
+
         {
           ...commonEditableColumns[2],
           flex: 1,
         },
+
         {
           ...commonEditableColumns[3],
           flex: 1,
         },
+
         {
           ...commonEditableColumns[4],
           flex: 0.8,
         },
       ];
+
+  // --------------------------------------------------
+  // CELL EDIT
+  // --------------------------------------------------
 
   const handleCellValueChanged = (event: CellValueChangedEvent<VariantRow>) => {
     const updatedRow: VariantRow = {
@@ -211,6 +282,10 @@ const VariantsGrid = ({
     onRowsChange(updatedRows);
   };
 
+  // --------------------------------------------------
+  // ROW SELECTION
+  // --------------------------------------------------
+
   const handleSelectionChanged = (event: SelectionChangedEvent<VariantRow>) => {
     const selectedRows = event.api.getSelectedRows();
 
@@ -219,23 +294,63 @@ const VariantsGrid = ({
     onSelectedRowChange(selectedRow?.clientId ?? null);
   };
 
+  // --------------------------------------------------
+  // RENDER
+  // --------------------------------------------------
+
   return (
-    <div
-      className="ag-theme-alpine mt-4"
-      style={{
-        height: 350,
-        width: "100%",
-        overflowX: isEditMode ? "auto" : "hidden",
-      }}
-    >
-      <AgGridReact<VariantRow>
-        rowData={rows}
-        columnDefs={columnDefs}
-        rowSelection="single"
-        onSelectionChanged={handleSelectionChanged}
-        onCellValueChanged={handleCellValueChanged}
-        getRowId={(params) => params.data.clientId}
-      />
+    <div className="mt-4">
+      {/* -------------------------------------------- */}
+      {/* BULK PRICE CONTROL */}
+      {/* -------------------------------------------- */}
+
+      {isEditMode && (
+        <div className="mb-3 flex items-center justify-end gap-2 rounded-lg border border-gray-200 bg-gray-50 px-3 py-2">
+          <label className="text-sm font-medium text-gray-700">
+            Price / Gram:
+          </label>
+
+          <input
+            type="number"
+            min="0"
+            step="0.01"
+            value={bulkPricePerGram}
+            onChange={(e) => setBulkPricePerGram(e.target.value)}
+            placeholder="9000"
+            className="w-28 rounded-md border border-gray-300 bg-white px-3 py-1.5 text-sm focus:border-blue-500 focus:outline-none"
+          />
+
+          <button
+            type="button"
+            onClick={handleApplyPriceToAll}
+            className="rounded-md bg-blue-600 px-3 py-1.5 text-sm font-medium text-white hover:bg-blue-700"
+          >
+            Apply to all variants
+          </button>
+        </div>
+      )}
+
+      {/* -------------------------------------------- */}
+      {/* VARIANTS GRID */}
+      {/* -------------------------------------------- */}
+
+      <div
+        className="ag-theme-alpine"
+        style={{
+          height: 350,
+          width: "100%",
+          overflowX: isEditMode ? "auto" : "hidden",
+        }}
+      >
+        <AgGridReact<VariantRow>
+          rowData={rows}
+          columnDefs={columnDefs}
+          rowSelection="single"
+          onSelectionChanged={handleSelectionChanged}
+          onCellValueChanged={handleCellValueChanged}
+          getRowId={(params) => params.data.clientId}
+        />
+      </div>
     </div>
   );
 };
