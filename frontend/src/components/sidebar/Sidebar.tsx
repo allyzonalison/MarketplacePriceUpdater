@@ -9,9 +9,11 @@ import {
 
 import { exportShopee } from "../../services/exportService";
 import { exportLazada } from "../../services/lazadaExportService";
+import { exportTikTok } from "../../services/tiktokExportService";
 
 import MarketplaceExportModal from "../modals/MarketplaceExportModal";
 import LazadaExportModal from "../modals/lazada/LazadaExportModal";
+import TikTokExportModal from "../modals/tiktok/TikTokExportModal";
 
 import { useProgress } from "../../hooks/useProgress";
 
@@ -34,6 +36,7 @@ const Sidebar = ({ onPreview, onApplySuccess }: SidebarProps) => {
 
   const [isShopeeModalOpen, setIsShopeeModalOpen] = useState(false);
   const [isLazadaModalOpen, setIsLazadaModalOpen] = useState(false);
+  const [isTikTokModalOpen, setIsTikTokModalOpen] = useState(false);
 
   const { showProgress } = useProgress();
 
@@ -225,7 +228,10 @@ const Sidebar = ({ onPreview, onApplySuccess }: SidebarProps) => {
               Lazada
             </button>
 
-            <button className="w-full rounded-lg bg-black py-3 font-semibold text-white hover:bg-gray-900">
+            <button
+              onClick={() => setIsTikTokModalOpen(true)}
+              className="w-full rounded-lg bg-black py-3 font-semibold text-white hover:bg-gray-900"
+            >
               TikTok
             </button>
           </div>
@@ -300,6 +306,32 @@ const Sidebar = ({ onPreview, onApplySuccess }: SidebarProps) => {
             window.URL.revokeObjectURL(url);
           } catch (err) {
             console.error("LAZADA EXPORT ERROR:", err);
+            throw err;
+          }
+        }}
+      />
+
+      <TikTokExportModal
+        isOpen={isTikTokModalOpen}
+        onClose={() => setIsTikTokModalOpen(false)}
+        onGenerate={async (file) => {
+          try {
+            const blob = await exportTikTok(file);
+
+            const url = window.URL.createObjectURL(blob);
+
+            const a = document.createElement("a");
+
+            a.href = url;
+            a.download = "TikTok_Updated.xlsx";
+
+            document.body.appendChild(a);
+            a.click();
+            document.body.removeChild(a);
+
+            window.URL.revokeObjectURL(url);
+          } catch (err) {
+            console.error("TIKTOK EXPORT ERROR:", err);
             throw err;
           }
         }}
