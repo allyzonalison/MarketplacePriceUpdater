@@ -376,8 +376,7 @@ const ProductModal = ({
               variationIdShopee: row.variationIdShopee,
 
               // Lazada
-              variationNameLazada:
-                row.variationName.trim() === "" ? null : row.variationName,
+              variationNameLazada: row.variationNameLazada,
 
               productIdLazada: row.productIdLazada,
 
@@ -388,8 +387,7 @@ const ProductModal = ({
               quantityLazada: row.quantityLazada,
 
               // TikTok
-              variationNameTiktok:
-                row.variationName.trim() === "" ? "Default" : row.variationName,
+              variationNameTiktok: row.variationNameTiktok,
 
               productIdTiktok: row.productIdTiktok,
 
