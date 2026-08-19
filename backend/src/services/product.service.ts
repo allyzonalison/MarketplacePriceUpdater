@@ -342,7 +342,9 @@ export const createProduct = async (dto: CreateProductDTO) => {
           // --------------------------------
           variationNameTiktok: dto.preserveMarketplaceValues
             ? row.variationNameTiktok ?? null
-            : variationName ?? "Default",
+            : hasMultipleVariants
+            ? variationName
+            : "Default",
 
           productIdTiktok: null,
           skuIdTiktok: null,
