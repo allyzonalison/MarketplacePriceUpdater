@@ -384,9 +384,13 @@ const ProductModal = ({
       category,
 
       rows: rows.map((row) => ({
-        ...row,
-
+        variationName: row.variationName,
+        supplier: row.supplier,
+        grams: row.grams,
+        pricePerGram:
+          row.pricePerGram == null ? null : Number(row.pricePerGram),
         sellingPrice: row.sellingPrice ?? 0,
+        stock: row.stock,
       })),
     };
 
