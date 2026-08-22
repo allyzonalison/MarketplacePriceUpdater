@@ -558,6 +558,7 @@ const ProductModal = ({
 
           <div className="mt-6">
             <VariantToolbar
+              isEditMode={isEditMode}
               onAddVariant={handleAddVariant}
               onRemoveVariant={handleRemoveVariant}
               onDeleteVariantShopee={handleDeleteVariantShopee}
@@ -572,34 +573,36 @@ const ProductModal = ({
               onSelectedRowChange={setSelectedVariantClientId}
             />
 
-            <div className="mt-5 border-t pt-4">
-              <h3 className="mb-3 text-sm font-semibold text-gray-600">
-                Marketplace Actions
-              </h3>
+            {isEditMode && (
+              <div className="mt-5 border-t pt-4">
+                <h3 className="mb-3 text-sm font-semibold text-gray-600">
+                  Marketplace Actions
+                </h3>
 
-              <div className="flex flex-wrap gap-2">
-                <button
-                  onClick={handleDeleteOnShopee}
-                  className="rounded-lg border border-orange-500 px-4 py-2 font-medium text-orange-600 hover:bg-orange-50"
-                >
-                  Delete on Shopee
-                </button>
+                <div className="flex flex-wrap gap-2">
+                  <button
+                    onClick={handleDeleteOnShopee}
+                    className="rounded-lg border border-orange-500 px-4 py-2 font-medium text-orange-600 hover:bg-orange-50"
+                  >
+                    Delete on Shopee
+                  </button>
 
-                <button
-                  onClick={handleDeleteOnLazada}
-                  className="rounded-lg border border-blue-600 px-4 py-2 font-medium text-blue-600 hover:bg-blue-50"
-                >
-                  Delete on Lazada
-                </button>
+                  <button
+                    onClick={handleDeleteOnLazada}
+                    className="rounded-lg border border-blue-600 px-4 py-2 font-medium text-blue-600 hover:bg-blue-50"
+                  >
+                    Delete on Lazada
+                  </button>
 
-                <button
-                  onClick={handleDeleteOnTiktok}
-                  className="rounded-lg border border-gray-800 px-4 py-2 font-medium text-gray-800 hover:bg-gray-100"
-                >
-                  Delete on TikTok
-                </button>
+                  <button
+                    onClick={handleDeleteOnTiktok}
+                    className="rounded-lg border border-gray-800 px-4 py-2 font-medium text-gray-800 hover:bg-gray-100"
+                  >
+                    Delete on TikTok
+                  </button>
+                </div>
               </div>
-            </div>
+            )}
           </div>
         </div>
 
