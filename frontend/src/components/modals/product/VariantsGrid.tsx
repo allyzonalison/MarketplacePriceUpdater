@@ -39,6 +39,7 @@ const VariantsGrid = ({
   onSelectedRowChange,
 }: Props) => {
   const [bulkPricePerGram, setBulkPricePerGram] = useState("");
+  const [bulkSupplier, setBulkSupplier] = useState("");
 
   // --------------------------------------------------
   // SELLING PRICE EDIT RULE
@@ -82,6 +83,24 @@ const VariantsGrid = ({
   };
 
   // --------------------------------------------------
+  // APPLY SUPPLIER TO ALL VARIANTS
+  // --------------------------------------------------
+
+  const handleApplySupplierToAll = () => {
+    if (!bulkSupplier) {
+      alert("Please select a supplier.");
+      return;
+    }
+
+    const updatedRows = rows.map((row) => ({
+      ...row,
+      supplier: bulkSupplier,
+    }));
+
+    onRowsChange(updatedRows);
+  };
+
+  // --------------------------------------------------
   // VARIATION COLUMN
   // --------------------------------------------------
 
@@ -102,7 +121,9 @@ const VariantsGrid = ({
       field: "supplier",
       flex: 1,
       editable: true,
+
       cellEditor: "agSelectCellEditor",
+
       cellEditorParams: {
         values: SUPPLIERS,
       },
@@ -301,11 +322,12 @@ const VariantsGrid = ({
   return (
     <div className="mt-4">
       {/* -------------------------------------------- */}
-      {/* BULK PRICE CONTROL */}
+      {/* BULK CONTROLS                                */}
       {/* -------------------------------------------- */}
 
-      {isEditMode && (
-        <div className="mb-3 flex items-center justify-end gap-2 rounded-lg border border-gray-200 bg-gray-50 px-3 py-2">
+      <div className="mb-3 flex items-center justify-end gap-6 rounded-lg border border-gray-200 bg-gray-50 px-3 py-2">
+        {/* PRICE / GRAM */}
+        <div className="flex items-center gap-2">
           <label className="text-sm font-medium text-gray-700">
             Price / Gram:
           </label>
@@ -328,10 +350,37 @@ const VariantsGrid = ({
             Apply to all variants
           </button>
         </div>
-      )}
+
+        {/* SUPPLIER */}
+        <div className="flex items-center gap-2">
+          <label className="text-sm font-medium text-gray-700">Supplier:</label>
+
+          <select
+            value={bulkSupplier}
+            onChange={(e) => setBulkSupplier(e.target.value)}
+            className="w-28 rounded-md border border-gray-300 bg-white px-3 py-1.5 text-sm focus:border-blue-500 focus:outline-none"
+          >
+            <option value="">Select</option>
+
+            {SUPPLIERS.map((supplier) => (
+              <option key={supplier} value={supplier}>
+                {supplier}
+              </option>
+            ))}
+          </select>
+
+          <button
+            type="button"
+            onClick={handleApplySupplierToAll}
+            className="rounded-md bg-blue-600 px-3 py-1.5 text-sm font-medium text-white hover:bg-blue-700"
+          >
+            Apply to all variants
+          </button>
+        </div>
+      </div>
 
       {/* -------------------------------------------- */}
-      {/* VARIANTS GRID */}
+      {/* VARIANTS GRID                                */}
       {/* -------------------------------------------- */}
 
       <div
